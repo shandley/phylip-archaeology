@@ -94,6 +94,7 @@ pub enum AminoAcid {
 }
 
 /// All 20 standard amino acids in canonical order.
+#[cfg(test)]
 const ALL_AMINO_ACIDS: [AminoAcid; N_AA] = [
     AminoAcid::Ala,
     AminoAcid::Arg,
