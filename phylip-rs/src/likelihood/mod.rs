@@ -4,5 +4,6 @@
 //! and heuristic tree search via stepwise addition with SPR rearrangement.
 
 pub mod models;
+pub mod nni;
 pub mod pruning;
 pub mod search;

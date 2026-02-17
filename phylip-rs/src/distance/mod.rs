@@ -6,6 +6,7 @@
 pub mod neighbor_joining;
 pub mod upgma;
 pub mod fitch_margoliash;
+pub mod ml_distances;
 
 pub use neighbor_joining::neighbor_joining;
 pub use upgma::upgma;
