@@ -9,6 +9,10 @@ repository = "https://github.com/phylip-archaeology/phylip-archaeology"
 keywords = ["phylogenetics", "bioinformatics", "evolution", "phylip", "algorithms"]
 categories = ["science", "algorithms"]
 
+[[bin]]
+name = "phylip-rs"
+path = "src/main.rs"
+
 [dependencies]
 
 [dev-dependencies]

@@ -7,6 +7,7 @@ pub mod gamma;
 pub mod model_selection;
 pub mod models;
 pub mod nni;
+pub mod optimized;
 pub mod pruning;
 pub mod search;
 pub mod ttratio;
