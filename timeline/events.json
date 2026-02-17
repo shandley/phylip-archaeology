@@ -1,0 +1,285 @@
+{
+  "title": "PHYLIP and Phylogenetics Software Timeline",
+  "description": "Key events in the history of PHYLIP, Joe Felsenstein's contributions, and the phylogenetics software ecosystem",
+  "events": [
+    {
+      "date": "1942-05-09",
+      "category": "biography",
+      "title": "Joe Felsenstein born",
+      "description": "Joseph Felsenstein born in Philadelphia, Pennsylvania. Future architect of computational phylogenetics."
+    },
+    {
+      "date": "1964",
+      "category": "biography",
+      "title": "Felsenstein B.S. under James F. Crow",
+      "description": "Felsenstein earns B.S. in Zoology (Honors) from University of Wisconsin-Madison, studying under population geneticist James F. Crow."
+    },
+    {
+      "date": "1967",
+      "category": "biography",
+      "title": "Felsenstein joins University of Washington",
+      "description": "Felsenstein joins UW as Assistant Professor of Genetics after completing Ph.D. at University of Chicago under Richard Lewontin."
+    },
+    {
+      "date": "1967",
+      "category": "algorithm",
+      "title": "Fitch-Margoliash method published",
+      "description": "Walter Fitch and Emanuel Margoliash publish their distance method for constructing phylogenetic trees from protein sequence data.",
+      "citation": "Fitch, W.M. & Margoliash, E. (1967). Science, 155, 279-284."
+    },
+    {
+      "date": "1969",
+      "category": "algorithm",
+      "title": "Jukes-Cantor model published",
+      "description": "Thomas Jukes and Charles Cantor publish the simplest nucleotide substitution model, assuming equal rates between all nucleotide pairs.",
+      "citation": "Jukes, T.H. & Cantor, C.R. (1969). In Mammalian Protein Metabolism, 21-132."
+    },
+    {
+      "date": "1977",
+      "category": "context",
+      "title": "Sanger sequencing developed",
+      "description": "Frederick Sanger publishes the chain-termination method for DNA sequencing, making molecular phylogenetics practical."
+    },
+    {
+      "date": "1973",
+      "category": "algorithm",
+      "title": "Felsenstein proposes ML for phylogenies",
+      "description": "Felsenstein publishes two papers proposing maximum likelihood estimation of phylogenetic trees, for discrete and continuous characters. These contain the first version of the pruning algorithm.",
+      "citation": "Felsenstein, J. (1973). Systematic Biology, 22, 240-249."
+    },
+    {
+      "date": "1978",
+      "category": "algorithm",
+      "title": "Felsenstein Zone / Long Branch Attraction",
+      "description": "Felsenstein demonstrates that parsimony can be statistically inconsistent, converging on the wrong tree. Introduces the concept of long branch attraction. Motivates adoption of model-based methods.",
+      "citation": "Felsenstein, J. (1978). Systematic Zoology, 27(4), 401-410.",
+      "milestone": true
+    },
+    {
+      "date": "1980",
+      "category": "algorithm",
+      "title": "Kimura 2-parameter model published",
+      "description": "Motoo Kimura publishes his two-parameter substitution model distinguishing transitions from transversions.",
+      "citation": "Kimura, M. (1980). Journal of Molecular Evolution, 16, 111-120."
+    },
+    {
+      "date": "1980-10",
+      "category": "phylip",
+      "title": "PHYLIP version 1.0 released",
+      "description": "Joe Felsenstein releases PHYLIP 1.0, distributed on magnetic tapes. Includes parsimony and distance methods written in Pascal. One of the first freely distributed bioinformatics software packages.",
+      "milestone": true
+    },
+    {
+      "date": "1981",
+      "category": "algorithm",
+      "title": "Felsenstein pruning algorithm published",
+      "description": "Felsenstein publishes the pruning algorithm for computing maximum likelihood on phylogenetic trees. This dynamic programming algorithm becomes the mathematical foundation of all modern ML phylogenetics software.",
+      "citation": "Felsenstein, J. (1981). Journal of Molecular Evolution, 17, 368-376.",
+      "milestone": true
+    },
+    {
+      "date": "1981",
+      "category": "algorithm",
+      "title": "Felsenstein 1981 (F81) substitution model",
+      "description": "The same 1981 paper introduces the F81 substitution model, allowing unequal base frequencies."
+    },
+    {
+      "date": "1982",
+      "category": "context",
+      "title": "GenBank established",
+      "description": "GenBank opens as a public repository of nucleotide sequences at Los Alamos National Laboratory."
+    },
+    {
+      "date": "1984",
+      "category": "phylip",
+      "title": "Meacham creates tree format for PHYLIP",
+      "description": "Christopher Meacham creates the tree-drawing format during sabbatical at University of Georgia, for PHYLIP's Drawgram and Drawtree programs. This becomes the basis for the Newick format."
+    },
+    {
+      "date": "1985",
+      "category": "algorithm",
+      "title": "Phylogenetic bootstrap published",
+      "description": "Felsenstein adapts Efron's bootstrap to phylogenetics, giving the field its first widely adopted measure of tree confidence. The method becomes ubiquitous.",
+      "citation": "Felsenstein, J. (1985). Evolution, 39, 783-791.",
+      "milestone": true
+    },
+    {
+      "date": "1985",
+      "category": "algorithm",
+      "title": "Phylogenetically independent contrasts published",
+      "description": "Felsenstein publishes PIC, solving the non-independence problem in cross-species comparisons. Becomes the 2nd most cited paper in The American Naturalist (~9,000+ citations).",
+      "citation": "Felsenstein, J. (1985). The American Naturalist, 125(1), 1-15.",
+      "milestone": true
+    },
+    {
+      "date": "1985",
+      "category": "context",
+      "title": "PCR invented",
+      "description": "Kary Mullis invents the polymerase chain reaction, revolutionizing molecular biology and enabling the explosion of sequence data that phylogenetics software would analyze."
+    },
+    {
+      "date": "1986-06-26",
+      "category": "standard",
+      "title": "Newick format adopted",
+      "description": "Felsenstein convenes committee at SSE meetings in Durham, NH. The standard is finalized at Newick's Lobster House in Dover, NH. Named after the restaurant. Becomes the universal tree format.",
+      "milestone": true
+    },
+    {
+      "date": "1987",
+      "category": "phylip",
+      "title": "PHYLIP version 3.0 released",
+      "description": "Major expansion of PHYLIP. More programs, improved portability, initial C implementations alongside Pascal."
+    },
+    {
+      "date": "1987",
+      "category": "algorithm",
+      "title": "Neighbor-joining published",
+      "description": "Naruya Saitou and Masatoshi Nei publish the neighbor-joining algorithm, which becomes the most widely used distance method for tree construction.",
+      "citation": "Saitou, N. & Nei, M. (1987). Molecular Biology and Evolution, 4, 406-425."
+    },
+    {
+      "date": "1989",
+      "category": "phylip",
+      "title": "PHYLIP formally cited in Cladistics",
+      "description": "Felsenstein publishes the formal PHYLIP citation paper for version 3.2, providing a citable reference for the thousands of researchers using the package.",
+      "citation": "Felsenstein, J. (1989). Cladistics, 5, 164-166."
+    },
+    {
+      "date": "1989",
+      "category": "phylip",
+      "title": "PHYLIP version 3.2 released",
+      "description": "Adds protein sequence analysis and maximum likelihood methods. PHYLIP becomes truly general-purpose."
+    },
+    {
+      "date": "1990",
+      "category": "context",
+      "title": "World Wide Web created",
+      "description": "Tim Berners-Lee creates the World Wide Web at CERN. Within a few years, Felsenstein's software catalog would become one of the most important scientific resource pages on the early web."
+    },
+    {
+      "date": "1992",
+      "category": "biography",
+      "title": "Felsenstein elected to AAAS",
+      "description": "Joe Felsenstein elected to the American Academy of Arts and Sciences."
+    },
+    {
+      "date": "1993",
+      "category": "biography",
+      "title": "President of SSE; Sewall Wright Award",
+      "description": "Felsenstein serves as President of the Society for the Study of Evolution and receives the Sewall Wright Award."
+    },
+    {
+      "date": "1993",
+      "category": "phylip",
+      "title": "PHYLIP version 3.3 — rewritten in C",
+      "description": "PHYLIP source code rewritten from Pascal to C, greatly expanding portability across operating systems including MacOS, Windows, and Linux."
+    },
+    {
+      "date": "1993",
+      "category": "catalog",
+      "title": "Software catalog page established",
+      "description": "Felsenstein establishes the phylogenetics software catalog on the web at evolution.genetics.washington.edu. Among the earliest comprehensive scientific software directories on the internet.",
+      "milestone": true
+    },
+    {
+      "date": "1996",
+      "category": "ecosystem",
+      "title": "MrBayes development begins",
+      "description": "John Huelsenbeck begins developing MrBayes, which will become the dominant Bayesian phylogenetics program. Built on ideas implemented in PHYLIP."
+    },
+    {
+      "date": "1999",
+      "category": "biography",
+      "title": "Felsenstein elected to NAS",
+      "description": "Joe Felsenstein elected to the National Academy of Sciences."
+    },
+    {
+      "date": "2000",
+      "category": "biography",
+      "title": "Weldon Memorial Prize",
+      "description": "Felsenstein receives the Weldon Memorial Prize from Oxford University."
+    },
+    {
+      "date": "2001",
+      "category": "ecosystem",
+      "title": "Bioconductor launched",
+      "description": "Bioconductor project launched for R-based bioinformatics. PHYLIP's catalog had been serving a similar discovery function for phylogenetics software for 8 years."
+    },
+    {
+      "date": "2002",
+      "category": "biography",
+      "title": "President's Award, Society of Systematic Biology",
+      "description": "Felsenstein receives the President's Award for Excellence in Systematics."
+    },
+    {
+      "date": "2004",
+      "category": "publication",
+      "title": "Inferring Phylogenies published",
+      "description": "Felsenstein publishes his comprehensive textbook with Sinauer Associates, covering the mathematical foundations of all major phylogenetic methods. Becomes the definitive reference in the field.",
+      "citation": "Felsenstein, J. (2004). Inferring Phylogenies. Sinauer Associates.",
+      "milestone": true
+    },
+    {
+      "date": "2005",
+      "category": "biography",
+      "title": "Honorary D.Sc., University of Edinburgh",
+      "description": "Felsenstein receives an Honorary Doctor of Science degree from the University of Edinburgh."
+    },
+    {
+      "date": "2006",
+      "category": "ecosystem",
+      "title": "RAxML gains prominence",
+      "description": "Alexandros Stamatakis's RAxML becomes the dominant ML program for large-scale phylogenetics. Uses Felsenstein's pruning algorithm at its core."
+    },
+    {
+      "date": "2009",
+      "category": "biography",
+      "title": "Darwin-Wallace Medal; Carty Award",
+      "description": "Felsenstein receives the Darwin-Wallace Medal from the Linnean Society of London and the John J. Carty Award for the Advancement of Science from the National Academy of Sciences."
+    },
+    {
+      "date": "2013",
+      "category": "biography",
+      "title": "International Prize for Biology (Japan)",
+      "description": "Felsenstein receives the International Prize for Biology from the Japan Society for the Promotion of Science."
+    },
+    {
+      "date": "2012",
+      "category": "catalog",
+      "title": "Catalog reaches 392 packages",
+      "description": "Felsenstein's software catalog grows to list 392 phylogeny packages and 54 free web servers, the most comprehensive directory of phylogenetics software ever maintained."
+    },
+    {
+      "date": "2014",
+      "category": "phylip",
+      "title": "PHYLIP surpasses 25,000 citations",
+      "description": "Cumulative citations of PHYLIP across all versions exceed 25,000. Over 30,000 registered users worldwide. Still cited over 1,000 times per year.",
+      "milestone": true
+    },
+    {
+      "date": "2016",
+      "category": "phylip",
+      "title": "PHYLIP version 3.696 — open source",
+      "description": "PHYLIP adopts an open-source license for the first time, allowing redistribution alongside commercially or restrictively licensed software.",
+      "milestone": true
+    },
+    {
+      "date": "2023-08-31",
+      "category": "catalog",
+      "title": "Pages migrated to GitHub",
+      "description": "PHYLIP pages and software catalog migrated from evolution.genetics.washington.edu to phylipweb.github.io/phylip/. Felsenstein invites community help in maintaining the catalog."
+    },
+    {
+      "date": "2023",
+      "category": "phylip",
+      "title": "PHYLIP version 3.698 released",
+      "description": "Latest version. Consensus tree bug fix, 64-bit Windows support for Java tree-drawing front-ends."
+    },
+    {
+      "date": "2026",
+      "category": "biography",
+      "title": "Mendel Medal",
+      "description": "Felsenstein receives the Mendel Medal from the U.K. Genetics Society."
+    }
+  ]
+}

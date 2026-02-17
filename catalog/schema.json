@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Phylogenetics Software Tool",
+  "description": "Schema for entries in the PHYLIP Archaeology software catalog, preserving Felsenstein's catalog of 392+ phylogenetics tools.",
+  "type": "object",
+  "required": ["name", "status", "categories"],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Name of the software tool"
+    },
+    "author": {
+      "type": "string",
+      "description": "Primary author(s)"
+    },
+    "institution": {
+      "type": "string",
+      "description": "Institution or affiliation of the author(s)"
+    },
+    "url_original": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "Original URL from Felsenstein's catalog"
+    },
+    "url_source": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "Source code repository URL (e.g., GitHub, SourceForge)"
+    },
+    "url_archive": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "Wayback Machine or other archive URL"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["maintained", "archived", "dormant", "dead", "unknown"],
+      "description": "Current availability status: maintained (active development), archived (code available but no updates), dormant (site exists but no recent activity), dead (URL unreachable, no archive found), unknown (not yet assessed)"
+    },
+    "status_checked": {
+      "type": ["string", "null"],
+      "format": "date",
+      "description": "Date when status was last verified (ISO 8601)"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "general-purpose",
+          "parsimony",
+          "distance",
+          "likelihood",
+          "bayesian",
+          "model-selection",
+          "bootstrap",
+          "alignment",
+          "tree-visualization",
+          "consensus",
+          "supertrees",
+          "tree-comparison",
+          "clock-dating",
+          "comparative-methods",
+          "simulation",
+          "recombination",
+          "biogeography",
+          "host-parasite",
+          "gene-duplication",
+          "genomics",
+          "sequence-editing",
+          "population-genetics",
+          "quartets",
+          "compatibility",
+          "teaching",
+          "network",
+          "utility"
+        ]
+      },
+      "description": "Functional categories from Felsenstein's classification"
+    },
+    "algorithms": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Specific algorithms implemented (e.g., 'neighbor-joining', 'felsenstein-pruning')"
+    },
+    "data_types": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "dna",
+          "protein",
+          "rna",
+          "distance-matrix",
+          "discrete-characters",
+          "continuous-characters",
+          "gene-frequencies",
+          "microsatellites",
+          "restriction-sites",
+          "rapd-rflp-aflp",
+          "snp",
+          "genome-rearrangement",
+          "morphological"
+        ]
+      },
+      "description": "Types of data the tool can analyze"
+    },
+    "languages": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Programming languages (e.g., 'c', 'java', 'python', 'fortran')"
+    },
+    "platforms": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["unix", "linux", "macos", "windows", "dos", "web", "cross-platform"]
+      },
+      "description": "Supported platforms"
+    },
+    "first_release": {
+      "type": ["string", "null"],
+      "description": "Year of first release (if known)"
+    },
+    "last_update": {
+      "type": ["string", "null"],
+      "description": "Year of last known update (if known)"
+    },
+    "license": {
+      "type": ["string", "null"],
+      "description": "License type (e.g., 'open-source', 'free-academic', 'commercial', 'unknown')"
+    },
+    "citation": {
+      "type": ["string", "null"],
+      "description": "Primary citation for the software"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of the tool from the catalog"
+    },
+    "catalog_section": {
+      "type": ["string", "null"],
+      "description": "Section of Felsenstein's catalog where this tool appeared"
+    },
+    "influence_lineage": {
+      "type": "object",
+      "properties": {
+        "influenced_by": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tools that influenced or preceded this one"
+        },
+        "influenced": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Tools that were influenced by or descended from this one"
+        }
+      },
+      "description": "Lineage of influence between tools"
+    },
+    "notes": {
+      "type": ["string", "null"],
+      "description": "Additional notes from archaeological analysis"
+    }
+  }
+}

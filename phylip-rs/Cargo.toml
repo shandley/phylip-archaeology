@@ -1,0 +1,14 @@
+[package]
+name = "phylip-rs"
+version = "0.1.0"
+edition = "2021"
+authors = ["PHYLIP Archaeology Project Contributors"]
+description = "Modern Rust reimplementations of classic phylogenetic algorithms from PHYLIP"
+license = "MIT"
+repository = "https://github.com/phylip-archaeology/phylip-archaeology"
+keywords = ["phylogenetics", "bioinformatics", "evolution", "phylip", "algorithms"]
+categories = ["science", "algorithms"]
+
+[dependencies]
+
+[dev-dependencies]
