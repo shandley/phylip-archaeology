@@ -32,6 +32,7 @@ pub mod f81;
 pub mod f84;
 pub mod jc69;
 pub mod k2p;
+pub mod protein;
 
 use crate::tree::{Alignment, Base, DistanceMatrix};
 use std::fmt;
