@@ -1,0 +1,13 @@
+[project]
+name = "phylip-catalog-analysis"
+version = "0.1.0"
+description = "Analysis and visualization of Felsenstein's phylogenetics software catalog"
+requires-python = ">=3.11"
+dependencies = [
+    "matplotlib>=3.8",
+    "seaborn>=0.13",
+    "numpy>=1.26",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
