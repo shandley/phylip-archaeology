@@ -45,6 +45,9 @@ the field is at risk of losing.
 See [TRIBUTE.md](TRIBUTE.md) for a full historical narrative of Felsenstein's
 contributions.
 
+See [REFLECTION.md](REFLECTION.md) for a reflection on what this project built and
+what we learned.
+
 ## phylip-rs: The Rust Reimplementation
 
 The heart of this project is `phylip-rs` -- a complete, modern Rust reimplementation
@@ -188,6 +191,7 @@ algorithm."
 phylip-archaeology/
 ├── INSIGHTS.md            # Deep analysis of PHYLIP's algorithmic insights
 ├── TRIBUTE.md             # Historical narrative of Felsenstein's contributions
+├── REFLECTION.md          # What we built and what we learned
 ├── catalog/               # Software catalog preservation (392+ tools)
 ├── phylip-source/         # PHYLIP C source code archive and analysis
 ├── algorithms/            # Extracted algorithm documentation
