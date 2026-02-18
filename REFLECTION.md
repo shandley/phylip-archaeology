@@ -14,14 +14,15 @@ What emerged was something more than preservation. By reimplementing every algor
 
 | Metric | Value |
 |--------|-------|
-| Lines of Rust | **20,749** |
-| Source files | **35** |
-| Unit tests | **561** |
-| Doc tests | **17** |
-| Total tests | **578** |
+| Lines of Rust | **35,805** |
+| Source files | **58** |
+| Unit tests | **934** |
+| Doc tests | **25** |
+| Total tests | **959** |
 | Compiler warnings | **0** |
 | External dependencies | **0** |
-| CLI commands | **5** |
+| PHYLIP programs covered | **~30/36** |
+| CLI commands | **9** |
 | Interactive demonstrations | **2** |
 | Substitution models | **4** (JC69, F84, Poisson, WAG) |
 
@@ -35,9 +36,15 @@ The zero-dependency constraint was deliberate and consequential. Every mathemati
 
 **Substitution Models** — JC69 (equal rates, analytical P(t)), F84 (unequal frequencies with purine/pyrimidine symmetry, closed-form P(t) requiring only two exponentials instead of eigendecomposition), Poisson model for protein sequences, and the WAG empirical amino acid rate matrix. A 20-state pruning algorithm for protein data.
 
-**Parsimony** — Fitch algorithm (1971) with bitwise state set operations: intersection for free steps, union for costly ones. Wagner parsimony tree search with SPR. Ancestral state reconstruction via the Fitch preorder pass.
+**Parsimony** — Fitch algorithm (1971) with bitwise state set operations: intersection for free steps, union for costly ones. Wagner parsimony tree search with SPR. Ancestral state reconstruction via the Fitch preorder pass. Dollo parsimony for gene gain/loss data (derived state arises once, losses free). Camin-Sokal irreversible parsimony. Branch-and-bound exact search (Hendy-Penny algorithm) guaranteed to find the optimal tree. Multistate parsimony with Sankoff weighted step matrix for up to 32 states. Protein parsimony with genetic code step matrix (minimum codon changes between amino acids). All parsimony methods share a pluggable ParsimonyScorer trait.
 
-**Distance Methods** — Neighbor-Joining (Saitou & Nei 1987) with the Q-criterion for partner selection. Fitch-Margoliash weighted least squares. ML pairwise distances via Newton-Raphson optimization of single-pair likelihoods.
+**Distance Methods** — Neighbor-Joining (Saitou & Nei 1987) with the Q-criterion for partner selection. Fitch-Margoliash weighted least squares. Kitsch clock-constrained least squares (ultrametric trees). ML pairwise distances via Newton-Raphson optimization. LogDet/Paralinear distance (compositionally robust, 4x4 determinant from first principles). Protein distances (Kimura 1983, Poisson, PAM/Dayhoff). Restriction site distances (Nei-Li 1979). Gene frequency distances (Nei's genetic distance, Cavalli-Sforza chord, Reynolds).
+
+**Tree Comparison** — Robinson-Foulds distance (symmetric difference of bipartitions). Normalized RF distance. Branch Score Distance (Kuhner-Felsenstein, Euclidean distance in split space with branch lengths). Shared split bitvector infrastructure across consensus and distance modules.
+
+**Compatibility & Invariants** — Character compatibility testing. Maximum clique finding via Bron-Kerbosch with pivoting. DNA compatibility search maximizing sites without homoplasy. Lake's phylogenetic invariants for 4-taxon problems. Cavender's invariants.
+
+**Comparative Methods** — Felsenstein's independent contrasts (1985) for continuous character data on trees. PIC correlation testing between trait pairs. Brownian motion ML with contrasts-based O(n) likelihood (avoiding n-by-n matrix inversion). ML tree search for continuous character data.
 
 **Statistical Support** — Bootstrap resampling using weight vectors (no data copying). Block bootstrap for spatially correlated sites. Delete-fraction jackknife. Full bootstrap + ML integration: replicate ML searches with consensus support values. Consensus trees: strict, majority-rule, extended majority-rule, and threshold methods, all built on bipartition (split) representations.
 
@@ -45,7 +52,9 @@ The zero-dependency constraint was deliberate and consequential. Every mathemati
 
 **Model Selection** — AIC, BIC, and AICc with proper parameter counting. Akaike weights for model averaging. The discipline of asking: "How many parameters are justified by the data?"
 
-**I/O** — PHYLIP interleaved and sequential format parser. FASTA parser (DNA and protein). Newick tree format reader and writer. PHYLIP-style formatted output reports. Command-line interface with five analysis modes.
+**Clock-Constrained ML** — Maximum likelihood with molecular clock assumption. Height-parameterized branch lengths enforcing ultrametricity. Reuses the pruning algorithm with constrained optimization.
+
+**I/O** — PHYLIP interleaved and sequential format parser. FASTA parser (DNA and protein). Binary (0/1) character data parser. Newick tree format reader and writer. PHYLIP-style formatted output reports. Command-line interface with nine analysis modes.
 
 ### Interactive Demonstrations
 

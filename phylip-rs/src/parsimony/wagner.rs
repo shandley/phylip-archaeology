@@ -40,6 +40,7 @@
 
 use std::fmt;
 
+use crate::parsimony::traits::ParsimonyScorer;
 use crate::tree::types::{Alignment, Base, Tree};
 
 /// A set of nucleotide states, represented as a 5-bit mask.
@@ -272,6 +273,233 @@ pub fn parsimony_score(
     let total: usize = site_steps.iter().sum();
 
     Ok((total, site_steps))
+}
+
+/// Compute the parsimony score using a pluggable scoring criterion.
+///
+/// This is the generic version of [`parsimony_score`] that accepts any
+/// [`ParsimonyScorer`] implementation. The scorer controls how leaf states
+/// are initialized and how child state sets are combined at internal nodes.
+///
+/// Returns the total score and per-site step counts.
+pub fn parsimony_score_with(
+    tree: &Tree,
+    alignment: &Alignment,
+    scorer: &dyn ParsimonyScorer,
+) -> Result<(usize, Vec<usize>), ParsimonyError> {
+    let nsites = alignment.nsites();
+    let nleaves = tree.num_leaves();
+    if nleaves == 0 {
+        return Err(ParsimonyError::EmptyTree);
+    }
+
+    // Build name -> alignment index map
+    let name_to_idx: std::collections::HashMap<&str, usize> = alignment
+        .sequences
+        .iter()
+        .enumerate()
+        .map(|(i, s)| (s.name.as_str(), i))
+        .collect();
+
+    // Initialize node data
+    let nnodes = tree.num_nodes();
+    let mut data = vec![NodeData::new(nsites); nnodes];
+
+    // Set leaf states from alignment using the scorer
+    for node in &tree.nodes {
+        if node.is_leaf() {
+            if let Some(name) = &node.name {
+                let taxon_idx = name_to_idx
+                    .get(name.as_str())
+                    .ok_or(ParsimonyError::TaxaMismatch)?;
+                for site in 0..nsites {
+                    data[node.id].states[site] =
+                        scorer.leaf_state(alignment.base(*taxon_idx, site));
+                }
+            }
+        }
+    }
+
+    // Postorder traversal: combine children using the scorer
+    let postorder = tree.postorder();
+    for &node_id in &postorder {
+        let children = &tree.nodes[node_id].children;
+        if children.is_empty() {
+            continue; // leaf: already initialized
+        }
+
+        let first_child = children[0];
+        for site in 0..nsites {
+            let mut current_states = data[first_child].states[site];
+            let mut current_steps: usize =
+                children.iter().map(|&c| data[c].steps[site]).sum();
+
+            for &child in &children[1..] {
+                let child_states = data[child].states[site];
+                let (combined, cost) = scorer.combine(current_states, child_states);
+                current_states = combined;
+                current_steps += cost;
+            }
+
+            data[node_id].states[site] = current_states;
+            data[node_id].steps[site] = current_steps;
+        }
+    }
+
+    // Total score from root
+    let root = tree.root;
+    let site_steps = data[root].steps.clone();
+    let total: usize = site_steps.iter().sum();
+
+    Ok((total, site_steps))
+}
+
+/// Search for the most parsimonious tree using a pluggable scoring criterion.
+///
+/// This is the generic version of [`search`] that accepts any
+/// [`ParsimonyScorer`] implementation. It uses stepwise addition followed
+/// by SPR rearrangement, just like `search`, but evaluates trees using
+/// the provided scorer.
+///
+/// # Arguments
+/// * `alignment` — the DNA alignment to analyze
+/// * `scorer` — the parsimony scoring criterion to use
+/// * `seed` — optional random seed for taxon addition order
+///
+/// # Returns
+/// A `ParsimonyResult` with the best tree found and its score.
+pub fn search_with(
+    alignment: &Alignment,
+    scorer: &dyn ParsimonyScorer,
+    seed: Option<u64>,
+) -> ParsimonyResult {
+    let ntaxa = alignment.ntaxa();
+    assert!(ntaxa >= 3, "need at least 3 taxa for tree search");
+
+    // Taxon addition order
+    let mut order: Vec<usize> = (0..ntaxa).collect();
+    if let Some(s) = seed {
+        let mut rng = SimpleRng::new(s);
+        rng.shuffle(&mut order);
+    }
+
+    // Phase 1: Stepwise addition
+    let mut tree = build_initial_tree(&order, alignment);
+
+    for i in 3..ntaxa {
+        let taxon_name = alignment.taxon_name(order[i]);
+        tree = best_insertion_with(&tree, taxon_name, alignment, scorer);
+    }
+
+    let mut score = quick_score_with(&tree, alignment, scorer);
+
+    // Phase 2: SPR rearrangement (iterate until no improvement)
+    loop {
+        let (new_tree, new_score, improved) =
+            spr_round_with(&tree, alignment, score, scorer);
+        if !improved {
+            break;
+        }
+        tree = new_tree;
+        score = new_score;
+    }
+
+    // Get final per-site scores
+    let (final_score, site_steps) = parsimony_score_with(&tree, alignment, scorer)
+        .expect("final scoring should not fail");
+
+    ParsimonyResult {
+        tree,
+        score: final_score,
+        site_steps,
+    }
+}
+
+/// Score a tree quickly using a pluggable scorer.
+fn quick_score_with(
+    tree: &Tree,
+    alignment: &Alignment,
+    scorer: &dyn ParsimonyScorer,
+) -> usize {
+    match parsimony_score_with(tree, alignment, scorer) {
+        Ok((score, _)) => score,
+        Err(_) => usize::MAX,
+    }
+}
+
+/// Try inserting a new taxon at every possible edge, using a pluggable scorer.
+fn best_insertion_with(
+    tree: &Tree,
+    taxon_name: &str,
+    alignment: &Alignment,
+    scorer: &dyn ParsimonyScorer,
+) -> Tree {
+    let mut best_tree = None;
+    let mut best_score = usize::MAX;
+
+    let edges: Vec<(usize, usize)> = tree
+        .nodes
+        .iter()
+        .filter_map(|n| n.parent.map(|p| (p, n.id)))
+        .collect();
+
+    for (parent_id, child_id) in edges {
+        let candidate = insert_on_edge(tree, parent_id, child_id, taxon_name);
+        let score = quick_score_with(&candidate, alignment, scorer);
+        if score < best_score {
+            best_score = score;
+            best_tree = Some(candidate);
+        }
+    }
+
+    best_tree.unwrap_or_else(|| {
+        let mut t = tree.clone();
+        let root = t.root;
+        t.add_node(Some(taxon_name.to_string()), None, Some(root));
+        t
+    })
+}
+
+/// Perform one round of SPR rearrangement using a pluggable scorer.
+fn spr_round_with(
+    tree: &Tree,
+    alignment: &Alignment,
+    current_score: usize,
+    scorer: &dyn ParsimonyScorer,
+) -> (Tree, usize, bool) {
+    let mut best_tree = tree.clone();
+    let mut best_score = current_score;
+    let mut improved = false;
+
+    let nodes_to_try: Vec<usize> = tree
+        .nodes
+        .iter()
+        .filter(|n| n.parent.is_some() && n.parent != Some(tree.root))
+        .map(|n| n.id)
+        .collect();
+
+    for &prune_node in &nodes_to_try {
+        if let Some(pruned) = prune_subtree(tree, prune_node) {
+            let edges: Vec<(usize, usize)> = pruned
+                .tree
+                .nodes
+                .iter()
+                .filter_map(|n| n.parent.map(|p| (p, n.id)))
+                .collect();
+
+            for (graft_parent, graft_child) in edges {
+                let candidate = regraft_subtree(&pruned, graft_parent, graft_child);
+                let score = quick_score_with(&candidate, alignment, scorer);
+                if score < best_score {
+                    best_score = score;
+                    best_tree = candidate;
+                    improved = true;
+                }
+            }
+        }
+    }
+
+    (best_tree, best_score, improved)
 }
 
 /// Reconstruct ancestral states at internal nodes using the Fitch method.

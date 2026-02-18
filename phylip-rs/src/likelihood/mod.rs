@@ -3,6 +3,7 @@
 //! Includes Felsenstein's pruning algorithm (1981), substitution models,
 //! and heuristic tree search via stepwise addition with SPR rearrangement.
 
+pub mod clock;
 pub mod gamma;
 pub mod model_selection;
 pub mod models;

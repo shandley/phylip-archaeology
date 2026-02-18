@@ -31,6 +31,7 @@
 //!
 //! Reference: Felsenstein, J. (2004). Inferring Phylogenies, Chapter 30.
 
+use crate::tree::splits::Split;
 use crate::tree::Tree;
 use std::collections::{HashMap, HashSet};
 use std::fmt;
@@ -79,125 +80,7 @@ impl fmt::Display for ConsensusError {
 
 impl std::error::Error for ConsensusError {}
 
-// ============================================================
-// Split (bipartition) with bit-vector representation
-// ============================================================
-
-/// A bipartition (split) of the taxon set, stored as a bit vector.
-///
-/// Each bit position corresponds to a taxon (by index). A set bit means
-/// the taxon is on one side of the split. The canonical form always stores
-/// the side that does NOT contain taxon 0 (index 0 is always 0 in the
-/// canonical form), unless the split is trivial.
-#[derive(Clone, PartialEq, Eq, Hash)]
-struct Split {
-    bits: Vec<u64>,
-    ntaxa: usize,
-}
-
-impl Split {
-    /// Create a new empty split for `ntaxa` taxa.
-    fn new(ntaxa: usize) -> Self {
-        let nwords = (ntaxa + 63) / 64;
-        Self {
-            bits: vec![0u64; nwords],
-            ntaxa,
-        }
-    }
-
-    /// Set taxon `i` as being on the "1" side of the split.
-    fn set(&mut self, i: usize) {
-        self.bits[i / 64] |= 1u64 << (i % 64);
-    }
-
-    /// Check if taxon `i` is on the "1" side.
-    fn get(&self, i: usize) -> bool {
-        (self.bits[i / 64] >> (i % 64)) & 1 == 1
-    }
-
-    /// Count the number of taxa on the "1" side.
-    fn count(&self) -> usize {
-        self.bits.iter().map(|w| w.count_ones() as usize).sum()
-    }
-
-    /// Canonicalize: ensure taxon 0 is always on the "0" side.
-    /// This means complementary representations map to the same canonical form.
-    fn canonicalize(&mut self) {
-        if self.get(0) {
-            self.complement();
-        }
-    }
-
-    /// Flip all bits (complement the split).
-    fn complement(&mut self) {
-        for w in &mut self.bits {
-            *w = !*w;
-        }
-        // Clear bits beyond ntaxa
-        let remainder = self.ntaxa % 64;
-        if remainder > 0 {
-            if let Some(last) = self.bits.last_mut() {
-                *last &= (1u64 << remainder) - 1;
-            }
-        }
-    }
-
-    /// Check if this split is trivial (0 or 1 taxa on either side).
-    fn is_trivial(&self) -> bool {
-        let c = self.count();
-        c <= 1 || c >= self.ntaxa - 1
-    }
-
-    /// Check if two splits are compatible.
-    ///
-    /// Two splits A|A' and B|B' are compatible if one of the four
-    /// intersections A∩B, A∩B', A'∩B, A'∩B' is empty.
-    fn is_compatible(&self, other: &Split) -> bool {
-        // A ∩ B
-        let ab: usize = self
-            .bits
-            .iter()
-            .zip(&other.bits)
-            .map(|(a, b)| (a & b).count_ones() as usize)
-            .sum();
-
-        // A ∩ B' (bits in self but not other)
-        let ab_prime: usize = self
-            .bits
-            .iter()
-            .zip(&other.bits)
-            .map(|(a, b)| (a & !b).count_ones() as usize)
-            .sum();
-
-        // A' ∩ B (bits in other but not self)
-        let a_prime_b: usize = self
-            .bits
-            .iter()
-            .zip(&other.bits)
-            .map(|(a, b)| (!a & b).count_ones() as usize)
-            .sum();
-
-        // A' ∩ B'
-        // We don't need to compute this separately: if any of the first three
-        // is zero, the splits are compatible. If a_prime_b_prime is zero,
-        // we also need to check it, but it equals ntaxa - ab - ab_prime - a_prime_b.
-        let a_prime_b_prime = self.ntaxa - ab - ab_prime - a_prime_b;
-
-        ab == 0 || ab_prime == 0 || a_prime_b == 0 || a_prime_b_prime == 0
-    }
-
-    /// Get the set of taxon indices on the "1" side.
-    fn taxa_indices(&self) -> Vec<usize> {
-        (0..self.ntaxa).filter(|&i| self.get(i)).collect()
-    }
-}
-
-impl fmt::Debug for Split {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let indices: Vec<usize> = self.taxa_indices();
-        write!(f, "Split({:?})", indices)
-    }
-}
+// Split type is imported from crate::tree::splits::Split
 
 // ============================================================
 // Split frequency counting
@@ -212,43 +95,20 @@ struct SplitInfo {
 }
 
 /// Extract all non-trivial splits from a tree, given a taxon-to-index mapping.
-fn extract_splits(tree: &Tree, taxon_index: &HashMap<String, usize>, ntaxa: usize) -> Vec<(Split, Option<f64>)> {
-    // Compute descendant taxon sets via postorder traversal
-    let mut desc_bits: Vec<Split> = vec![Split::new(ntaxa); tree.num_nodes()];
-
-    for &node_id in &tree.postorder() {
-        let node = &tree.nodes[node_id];
-        if node.is_leaf() {
-            if let Some(ref name) = node.name {
-                if let Some(&idx) = taxon_index.get(name.as_str()) {
-                    desc_bits[node_id].set(idx);
-                }
-            }
-        } else {
-            for &child in &node.children {
-                for (w_idx, &w) in desc_bits[child].bits.clone().iter().enumerate() {
-                    desc_bits[node_id].bits[w_idx] |= w;
-                }
-            }
-        }
+///
+/// Delegates to the shared `crate::tree::splits::extract_splits` function,
+/// converting the taxon index map into the sorted taxon order it expects.
+fn consensus_extract_splits(
+    tree: &Tree,
+    taxon_index: &HashMap<String, usize>,
+    ntaxa: usize,
+) -> Vec<(Split, Option<f64>)> {
+    // Build sorted taxon order from the index map
+    let mut taxon_order = vec![String::new(); ntaxa];
+    for (name, &idx) in taxon_index {
+        taxon_order[idx] = name.clone();
     }
-
-    let mut splits = Vec::new();
-    for node_id in 0..tree.num_nodes() {
-        let node = &tree.nodes[node_id];
-        if node.is_leaf() || node_id == tree.root {
-            continue;
-        }
-
-        let mut split = desc_bits[node_id].clone();
-        split.canonicalize();
-
-        if !split.is_trivial() {
-            splits.push((split, node.branch_length));
-        }
-    }
-
-    splits
+    crate::tree::splits::extract_splits(tree, &taxon_order)
 }
 
 /// Count split frequencies across multiple trees.
@@ -260,7 +120,7 @@ fn count_splits(
     let mut split_map: HashMap<Split, (usize, f64)> = HashMap::new();
 
     for tree in trees {
-        let tree_splits = extract_splits(tree, taxon_index, ntaxa);
+        let tree_splits = consensus_extract_splits(tree, taxon_index, ntaxa);
         // Deduplicate within a single tree (same split from both children of root)
         let mut seen = HashSet::new();
         for (split, bl) in tree_splits {
@@ -721,7 +581,7 @@ mod tests {
         let taxon_index: HashMap<String, usize> =
             taxa.iter().enumerate().map(|(i, n)| (n.clone(), i)).collect();
 
-        let splits = extract_splits(&tree, &taxon_index, 4);
+        let splits = consensus_extract_splits(&tree, &taxon_index, 4);
         // Should have 1 unique non-trivial split (after dedup, may see 2 raw)
         let unique: HashSet<Split> = splits.into_iter().map(|(s, _)| s).collect();
         assert_eq!(unique.len(), 1, "4-taxon symmetric tree has 1 non-trivial split");
@@ -739,7 +599,7 @@ mod tests {
         let taxon_index: HashMap<String, usize> =
             taxa.iter().enumerate().map(|(i, n)| (n.clone(), i)).collect();
 
-        let splits = extract_splits(&tree, &taxon_index, 5);
+        let splits = consensus_extract_splits(&tree, &taxon_index, 5);
         let unique: HashSet<Split> = splits.into_iter().map(|(s, _)| s).collect();
         assert!(unique.len() >= 2, "5-taxon tree should have at least 2 non-trivial splits");
     }

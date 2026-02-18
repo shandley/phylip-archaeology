@@ -59,12 +59,15 @@ continued fractions -- is implemented from first principles using only `std`.
 
 | Metric | Value |
 |--------|-------|
-| Lines of Rust | **20,749** |
-| Source files | **35** |
-| Unit tests | **561** |
-| Doc tests | **17** |
+| Lines of Rust | **35,805** |
+| Source files | **58** |
+| Unit tests | **934** |
+| Doc tests | **25** |
+| Total tests | **959** |
 | Compiler warnings | **0** |
 | External dependencies | **0** |
+| PHYLIP programs covered | **~30/36** |
+| CLI commands | **9** |
 
 ### Algorithms Implemented
 
@@ -77,22 +80,52 @@ continued fractions -- is implemented from first principles using only `std`.
 - Discrete gamma site rate heterogeneity (Yang 1994)
 - Model selection via AIC, BIC, and AICc with Akaike weights
 - Optimized engine with site-pattern compression and transition matrix caching
+- Clock-constrained ML (dnamlk) -- height-parameterized branch lengths
 
-**Substitution Models**
+**Substitution Models & Distance Formulas**
 - JC69 (Jukes-Cantor 1969) -- equal rates
 - F84 (Felsenstein 1984) -- unequal frequencies, ts/tv distinction
 - Poisson and WAG models for protein sequences
 - 20-state pruning algorithm for amino acid data
+- LogDet/Paralinear distance -- compositionally robust, 4x4 determinant from first principles
+- Protein distances: Kimura (1983), Poisson, PAM/Dayhoff
+- Restriction site distances: Nei-Li (1979)
+- Gene frequency distances: Nei's genetic distance, Cavalli-Sforza chord, Reynolds
 
 **Parsimony**
 - Fitch algorithm (1971) with bitwise state set operations
 - Wagner parsimony tree search via stepwise addition + SPR
 - Ancestral state reconstruction (Fitch preorder pass)
+- Dollo parsimony -- derived state arises once, losses free (dollop)
+- Camin-Sokal irreversible parsimony -- 0->1 only (mix)
+- Branch-and-bound exact search -- Hendy-Penny algorithm, guaranteed optimal (dnapenny)
+- Multistate parsimony -- up to 32 states with Sankoff weighted step matrix (pars)
+- Protein parsimony -- genetic code step matrix, 20-state Sankoff (protpars)
+- Pluggable ParsimonyScorer trait for custom scoring criteria
 
 **Distance Methods**
 - Neighbor-Joining (Saitou & Nei 1987)
 - Fitch-Margoliash weighted least squares
+- Kitsch -- clock-constrained Fitch-Margoliash (ultrametric least squares)
 - ML pairwise distances via Newton-Raphson optimization
+
+**Tree Comparison**
+- Robinson-Foulds distance (symmetric difference of bipartitions)
+- Normalized Robinson-Foulds distance
+- Branch Score Distance (Kuhner-Felsenstein) -- Euclidean distance in split space
+
+**Compatibility & Invariants**
+- Character compatibility analysis with pairwise compatibility testing
+- Maximum clique finding via Bron-Kerbosch with pivoting (clique)
+- DNA compatibility search -- maximize sites without homoplasy (dnacomp)
+- Lake's phylogenetic invariants for 4-taxon problems (dnainvar)
+- Cavender's invariants
+
+**Comparative Methods**
+- Felsenstein's independent contrasts (1985) -- standardized contrasts on trees (contrast)
+- PIC correlation testing between continuous traits
+- Brownian motion ML -- contrasts-based O(n) likelihood (contml)
+- ML tree search for continuous character data
 
 **Statistical Support**
 - Bootstrap resampling (Felsenstein 1985)
@@ -104,9 +137,10 @@ continued fractions -- is implemented from first principles using only `std`.
 **I/O and Interface**
 - PHYLIP interleaved/sequential format parser
 - FASTA parser (DNA and protein)
+- Binary (0/1) character data parser
 - Newick tree format reader/writer
 - PHYLIP-style output reports
-- Command-line interface with 5 analysis commands
+- Command-line interface with 9 analysis commands
 
 ### Quick Start
 
@@ -132,16 +166,22 @@ cargo run --release -- bootstrap --input alignment.fasta --replicates 100
 
 ```
 phylip-rs/src/
-  tree/          Core types (Tree, Alignment, Base), Newick I/O
-  models/        Substitution models (JC69, F84, protein/WAG)
+  tree/          Core types (Tree, Alignment, Base), Newick I/O,
+                 splits, Robinson-Foulds & Branch Score distances
+  models/        Substitution models (JC69, F84, protein/WAG),
+                 LogDet, protein distances, restriction, gene freq
   likelihood/    Pruning algorithm, ML search, NNI, gamma rates,
-                 ts/tv estimation, model selection, optimized engine
-  parsimony/     Wagner parsimony tree search
-  distance/      NJ, Fitch-Margoliash, ML pairwise distances
+                 ts/tv estimation, model selection, clock ML
+  parsimony/     Wagner, Dollo, Camin-Sokal, branch-and-bound,
+                 multistate (Sankoff), protein parsimony
+  distance/      NJ, Fitch-Margoliash, Kitsch, ML distances
   bootstrap/     Resampling, consensus trees, ML bootstrap
   consensus/     Strict/majority-rule/extended consensus
-  io/            PHYLIP format parser, FASTA, output reports
-  main.rs        CLI binary with 5 analysis commands
+  compatibility/ Clique analysis (Bron-Kerbosch), DNA compatibility
+  comparative/   Independent contrasts, Brownian motion ML
+  invariants/    Lake's & Cavender's phylogenetic invariants
+  io/            PHYLIP format, FASTA, binary data, output reports
+  main.rs        CLI binary with 9 analysis commands
 ```
 
 ## Interactive Demonstrations
@@ -205,7 +245,7 @@ phylip-archaeology/
 
 - **Fidelity first**: Preserve original algorithms exactly before modernizing
 - **Zero dependencies**: The code is its own textbook -- every function from first principles
-- **Validation**: 578 tests verify correctness against known analytical results
+- **Validation**: 959 tests verify correctness against known analytical results
 - **Attribution**: Every algorithm traces back to its originator and key papers
 - **Accessibility**: Clear documentation for both historians and practitioners
 - **Respect**: This is archaeology, not criticism -- honor the constraints of the era

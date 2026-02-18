@@ -15,15 +15,20 @@
 //! - `parsimony` - Maximum parsimony methods
 //! - `likelihood` - Maximum likelihood methods (Felsenstein pruning algorithm)
 //! - `bootstrap` - Bootstrap resampling for confidence estimation
+//! - `compatibility` - Character compatibility analysis and clique finding
 //! - `consensus` - Consensus tree construction (strict, majority-rule, extended)
 //! - `io` - File format I/O (PHYLIP format, FASTA)
 //! - `models` - Nucleotide substitution models (JC69, K2P, F81, F84)
+//! - `comparative` - Continuous character comparative methods (independent contrasts, contml)
 
 pub mod tree;
 pub mod distance;
 pub mod parsimony;
 pub mod likelihood;
 pub mod bootstrap;
+pub mod compatibility;
+pub mod comparative;
 pub mod consensus;
+pub mod invariants;
 pub mod io;
 pub mod models;

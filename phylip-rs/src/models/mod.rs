@@ -1,15 +1,26 @@
-//! Nucleotide substitution models for computing pairwise evolutionary distances.
+//! Nucleotide substitution models and distance measures for phylogenetics.
 //!
-//! This module provides implementations of four classical nucleotide substitution
-//! models used in molecular phylogenetics:
+//! This module provides implementations of classical nucleotide substitution
+//! models used in molecular phylogenetics, plus gene frequency distance
+//! measures for population genetics:
+//!
+//! **Nucleotide substitution models** (implement [`DistanceModel`]):
 //!
 //! - [`jc69::JC69`] — Jukes-Cantor (1969): equal rates, equal frequencies
 //! - [`k2p::K2P`] — Kimura 2-parameter (1980): transitions vs transversions
 //! - [`f81::F81`] — Felsenstein (1981): unequal frequencies, equal rates
 //! - [`f84::F84`] — Felsenstein (1984): unequal frequencies + ts/tv distinction
+//! - [`logdet::LogDet`] — LogDet/Paralinear (1994): compositionally robust
 //!
-//! All models implement the [`DistanceModel`] trait, which provides a uniform
-//! interface for computing pairwise evolutionary distances between DNA sequences.
+//! **Gene frequency distances** (see [`gene_freq`]):
+//!
+//! - Nei's genetic distance (Nei 1972)
+//! - Cavalli-Sforza chord distance (Cavalli-Sforza & Edwards 1967)
+//! - Reynolds coancestry distance (Reynolds et al. 1983)
+//!
+//! All nucleotide substitution models implement the [`DistanceModel`] trait,
+//! which provides a uniform interface for computing pairwise evolutionary
+//! distances between DNA sequences.
 //!
 //! # Computing a distance matrix
 //!
@@ -30,9 +41,13 @@
 
 pub mod f81;
 pub mod f84;
+pub mod gene_freq;
 pub mod jc69;
 pub mod k2p;
+pub mod logdet;
 pub mod protein;
+pub mod protein_distances;
+pub mod restriction;
 
 use crate::tree::{Alignment, Base, DistanceMatrix};
 use std::fmt;

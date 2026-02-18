@@ -3,7 +3,9 @@
 //! Core types for representing rooted and unrooted phylogenetic trees,
 //! with support for reading and writing Newick format strings.
 
+pub mod distances;
 pub mod newick;
+pub mod splits;
 pub mod types;
 
 pub use types::{
