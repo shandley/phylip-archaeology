@@ -186,8 +186,8 @@ phylip-rs/src/
 
 ## Interactive Demonstrations
 
-Two executable examples demonstrate insights from the algorithms in contexts beyond
-traditional phylogenetics.
+Ten executable examples demonstrate algorithmic insights, each proving a specific claim
+with concrete numerical results. Run any of them with `cargo run --release --example <name>`.
 
 ### The Felsenstein Zone: When More Data Makes You More Wrong
 
@@ -197,33 +197,93 @@ cargo run --release --example felsenstein_zone
 
 Simulates Felsenstein's famous 1978 result: maximum parsimony converges on the
 **wrong** tree with increasing confidence as you add data, while maximum likelihood
-correctly recovers the truth. The simulation generates DNA sequences along a tree
-with two long branches (long branch attraction), then evaluates all three possible
-4-taxon topologies under both methods.
-
-```
-  Sites | Parsimony correct |    ML correct | Parsimony picks T3 (wrong)
---------|-------------------|---------------|---------------------------
-    100 |                8% |           88% |                        92%
-    500 |                2% |          100% |                        98%
-   1000 |                0% |          100% |                       100%
-   5000 |                0% |          100% |                       100%
-  10000 |                0% |          100% |                       100%
-```
+correctly recovers the truth.
 
 ### Language Evolution: DNA Code Analyzes Human Languages
 
 ```bash
-cargo run --example language_evolution
+cargo run --release --example language_evolution
 ```
 
 Applies the **exact same pruning algorithm** -- designed for DNA -- to linguistic
-data: cognate class assignments for 37 vocabulary items across English, German,
-French, Italian, Spanish, and Portuguese. Not a single line of code changes. The
-algorithm correctly identifies the known language family tree and reconstructs
-"proto-language" states at the root. Demonstrates that Felsenstein's algorithm is a
-general-purpose inference engine for discrete states on trees, not just a "DNA
-algorithm."
+data across 6 Romance and Germanic languages. Not a single line of code changes.
+
+### Compositional Bias: LogDet vs JC69
+
+```bash
+cargo run --release --example compositional_bias
+```
+
+Proves LogDet distance is robust to base composition bias. Simulates sequences where
+two unrelated lineages share high GC-content. JC69 groups by GC (wrong tree); LogDet
+recovers the true tree. At 30% bias, JC69 accuracy drops to 64% while LogDet stays at 100%.
+
+### Kirchhoff's Contrasts: Phylogenetics = Circuit Theory
+
+```bash
+cargo run --release --example kirchhoff_contrasts
+```
+
+Proves that Felsenstein's independent contrasts algorithm is mathematically identical
+to solving a resistor network. Side-by-side computation shows contrasts variances and
+circuit effective resistances match to 8+ decimal places.
+
+### Branch-and-Bound: Exact Search Through Exponential Space
+
+```bash
+cargo run --release --example supplement_bound
+```
+
+Demonstrates how the Hendy-Penny branch-and-bound algorithm prunes the vast majority
+of the search space. For 9 taxa (135,135 possible topologies), B&B examines only
+~0.05% while guaranteeing the globally optimal solution.
+
+### Dollo vs Fitch: Different Models, Different Stories
+
+```bash
+cargo run --release --example dollo_gain_loss
+```
+
+Shows how Dollo and Fitch parsimony give the same optimal topology but tell
+fundamentally different biological stories about gain/loss evolution.
+
+### Chord Distance Geometry: Allele Frequencies on a Hypersphere
+
+```bash
+cargo run --release --example chord_geometry
+```
+
+Proves the Cavalli-Sforza chord distance is a literal chord on a hypersphere.
+Square-root transformation maps allele frequencies to the unit sphere; the chord
+distance is proportional to drift time while raw Euclidean distance is not.
+
+### Clock Constraints: UPGMA vs Kitsch
+
+```bash
+cargo run --release --example clock_constraints
+```
+
+Demonstrates how Kitsch optimizes node heights under the ultrametric constraint,
+achieving better fits than UPGMA when the molecular clock is violated.
+
+### Lake's Invariants: Model-Free Topology Identification
+
+```bash
+cargo run --release --example lake_invariants
+```
+
+Proves that polynomial invariants of site-pattern frequencies can identify the true
+4-taxon topology. Both Lake's and Cavender's methods reach 100% accuracy at 500+ sites.
+
+### The Genetic Code Step Matrix: Evolution's Error-Correcting Code
+
+```bash
+cargo run --release --example genetic_code_distances
+```
+
+Computes the 20x20 amino acid step matrix from the genetic code and proves the code is
+optimized to minimize mutation impact. Compared to 1000 random codes, the real genetic
+code has a lower average step distance than any random permutation (z-score = -2.76).
 
 ## Project Structure
 
@@ -235,9 +295,9 @@ phylip-archaeology/
 ├── catalog/               # Software catalog preservation (392+ tools)
 ├── phylip-source/         # PHYLIP C source code archive and analysis
 ├── algorithms/            # Extracted algorithm documentation
-├── phylip-rs/             # Modern Rust reimplementation (20,749 lines)
-│   ├── src/               # Library and CLI source
-│   └── examples/          # Interactive demonstrations
+├── phylip-rs/             # Modern Rust reimplementation (35,805 lines)
+│   ├── src/               # Library and CLI source (58 files)
+│   └── examples/          # Interactive demonstrations (10)
 └── timeline/              # Historical data and visualizations
 ```
 

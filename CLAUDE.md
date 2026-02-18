@@ -37,6 +37,7 @@ phylip-archaeology/
 | External dependencies | 0 |
 | PHYLIP programs covered | ~30/36 |
 | CLI commands | 9 |
+| Interactive demonstrations | 10 |
 
 ## phylip-rs Module Map
 
