@@ -39,10 +39,10 @@ phylip-archaeology/
 
 | Metric | Value |
 |--------|-------|
-| Lines of Rust | 36,745 |
-| Source files | 57 |
+| Lines of Rust | 35,805 |
+| Source files | 58 |
 | Unit tests | 934 |
-| Doc tests | 27 |
+| Doc tests | 25 |
 | Total tests | 959 |
 | Compiler warnings | 0 |
 | External dependencies | 0 |
@@ -105,7 +105,7 @@ drawgram, drawtree, dnamove, dolmove, move, retree, factor
 ## Project Status
 
 ### Completed
-- **Rust reimplementation** — 36,745 lines, 959 tests, ~30/36 PHYLIP programs, zero dependencies
+- **Rust reimplementation** — 35,805 lines, 959 tests, ~30/36 PHYLIP programs, zero dependencies
 - **20 algorithmic case studies** — Cross-disciplinary insights documented in INSIGHTS.md
 - **10 interactive demonstrations** — Compilable examples in phylip-rs/examples/
 - **Software catalog analysis** — 407 tools scraped, enriched, analyzed; Figure 4 generated

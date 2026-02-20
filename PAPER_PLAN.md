@@ -68,7 +68,7 @@ The audience extends beyond phylogenetics to anyone maintaining or inheriting le
 ### Abstract (150 words)
 - Problem: Legacy scientific software contains algorithmic knowledge at risk of being lost
 - Approach: LLM-assisted code archaeology applied to PHYLIP
-- Results: 20 algorithmic insights recovered, validated Rust reimplementation (36,745 lines, 961 tests), connections to 10+ fields outside phylogenetics
+- Results: 20 algorithmic insights recovered, validated Rust reimplementation (35,805 lines, 959 tests), connections to 10+ fields outside phylogenetics
 - Impact: New methodology for computational science preservation
 
 ### Introduction (~500 words)
@@ -96,7 +96,7 @@ The audience extends beyond phylogenetics to anyone maintaining or inheriting le
   5. Felsenstein Zone (the most famous result, good for accessibility)
 
 **Validated reimplementation**
-- 36,745 lines of Rust, 961 tests, zero dependencies
+- 35,805 lines of Rust, 959 tests, zero dependencies
 - ~30/36 PHYLIP programs covered
 - Performance characteristics vs. original C code
 - What validation against known analytical results looks like

@@ -8,7 +8,7 @@ Scott A. Handley
 
 ## Supplementary Note 1: Complete Algorithmic Case Studies
 
-The 20 algorithmic insights recovered from PHYLIP source code, with full mathematical descriptions, implementation details, cross-disciplinary connections, and numerical demonstrations.
+The 20 cross-disciplinary connections identified in PHYLIP source code, with full mathematical descriptions, implementation details, and numerical demonstrations.
 
 *Content: Full text of INSIGHTS.md (964 lines), covering:*
 
@@ -21,7 +21,7 @@ The 20 algorithmic insights recovered from PHYLIP source code, with full mathema
 | 5 | Discrete gamma rates | Mixture models / log-sum-exp |
 | 6 | Fitch parsimony | Bitwise set operations |
 | 7 | Model selection (AIC/BIC) | Regularization theory |
-| 8 | First-principles derivation | Lost computational discipline |
+| 8 | First-principles derivation | Computational self-sufficiency |
 | 9 | Independent contrasts | Kirchhoff's circuit laws |
 | 10 | Contml stereographic projection | Hellinger embedding / information geometry |
 | 11 | Hendy-Penny supplement bound | Dual decomposition / Lagrangian relaxation |
@@ -68,7 +68,8 @@ Complete results for all 180 benchmark runs (36 datasets x 5 tools), including w
 | bootstrap/ | 3 | 1,355 | 41 | Resampling, consensus trees, ML bootstrap |
 | invariants/ | 2 | 830 | 18 | Lake's and Cavender's phylogenetic invariants |
 | consensus/ | 1 | 814 | 25 | Strict/majority-rule/extended consensus |
-| **Total** | **60** | **36,745** | **959** | |
+| main.rs, lib.rs | 2 | 940 | 25 (doc) | CLI binary and library root |
+| **Total** | **58** | **35,805** | **959** | 934 unit + 25 doc tests |
 
 ---
 
