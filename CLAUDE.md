@@ -10,17 +10,28 @@
 phylip-archaeology/
 ├── CLAUDE.md              # This file — project context
 ├── README.md              # Project overview and documentation
-├── INSIGHTS.md            # Deep analysis of PHYLIP's algorithmic insights
+├── INSIGHTS.md            # Deep analysis of 20 algorithmic case studies
 ├── TRIBUTE.md             # Historical narrative of Felsenstein's contributions
 ├── REFLECTION.md          # What we built and what we learned
+├── PAPER_PLAN.md           # Nature Methods paper planning document
 ├── Cargo.toml             # Workspace root
-├── catalog/               # Software catalog preservation (392+ tools)
-├── phylip-source/         # PHYLIP C source code archive and analysis
-├── algorithms/            # Extracted algorithm documentation
 ├── phylip-rs/             # Modern Rust reimplementation
 │   ├── Cargo.toml
-│   ├── src/               # Library and CLI source (58 files)
-│   └── examples/          # Interactive demonstrations (2)
+│   ├── src/               # Library and CLI source (57 files)
+│   └── examples/          # 10 interactive demonstrations
+├── manuscript/            # Nature Methods Article draft
+│   ├── manuscript.md      # Full manuscript (~3,000 words + Methods)
+│   └── supplementary.md   # Supplementary material outline
+├── benchmarks/            # Performance benchmarking pipeline
+│   ├── generate_data.py   # JC69 dataset simulator
+│   ├── run_benchmarks.py  # Multi-tool benchmark runner
+│   ├── plot_figure5.py    # Figure generation script
+│   ├── results/           # benchmark_results.csv (180 runs)
+│   └── figures/           # Figure 5 (PDF/PNG)
+├── catalog/               # Software catalog preservation (407 tools)
+│   └── analysis/          # Scraping, enrichment, Figure 4
+├── phylip-source/         # PHYLIP C source code archive and analysis
+├── algorithms/            # Extracted algorithm documentation
 └── timeline/              # Historical data and visualizations
 ```
 
@@ -28,16 +39,19 @@ phylip-archaeology/
 
 | Metric | Value |
 |--------|-------|
-| Lines of Rust | 35,805 |
-| Source files | 58 |
+| Lines of Rust | 36,745 |
+| Source files | 57 |
 | Unit tests | 934 |
-| Doc tests | 25 |
-| Total tests | 959 |
+| Doc tests | 27 |
+| Total tests | 961 |
 | Compiler warnings | 0 |
 | External dependencies | 0 |
 | PHYLIP programs covered | ~30/36 |
 | CLI commands | 9 |
 | Interactive demonstrations | 10 |
+| Algorithmic case studies | 20 |
+| Software catalog tools | 407 |
+| Benchmark datasets | 36 |
 
 ## phylip-rs Module Map
 
@@ -67,7 +81,7 @@ phylip-rs/src/
 ```bash
 cd phylip-rs
 cargo build                    # Build library and CLI
-cargo test                     # Run all 959 tests
+cargo test                     # Run all 961 tests
 cargo build --examples         # Build interactive demonstrations
 cargo run --release -- --help  # CLI usage
 ```
@@ -82,20 +96,24 @@ cargo run --release -- --help  # CLI usage
 ## Git State
 
 - **Branch:** main
-- **Unpushed:** 1 commit (algorithm expansion from ~12 to ~30 PHYLIP programs, +15,299 lines)
 - **Remote:** origin (GitHub: shandley/phylip-archaeology)
 
 ## 6 Programs NOT Covered (interactive/drawing tools, not algorithmic)
 
 drawgram, drawtree, dnamove, dolmove, move, retree, factor
 
-## Previously Discussed Next Steps (Not Yet Started)
+## Project Status
 
-These were proposed before the algorithm expansion and should be re-evaluated:
+### Completed
+- **Rust reimplementation** — 36,745 lines, 961 tests, ~30/36 PHYLIP programs, zero dependencies
+- **20 algorithmic case studies** — Cross-disciplinary insights documented in INSIGHTS.md
+- **10 interactive demonstrations** — Compilable examples in phylip-rs/examples/
+- **Software catalog analysis** — 407 tools scraped, enriched, analyzed; Figure 4 generated
+- **Performance benchmarking** — 180 runs (36 datasets x 5 tools); Figure 5 generated
+- **Manuscript draft** — Nature Methods Article in manuscript/manuscript.md (~3,000 words + Methods)
 
-1. **Academic paper** — "PHYLIP Archaeology: Rediscovering the Algorithmic Foundations of Phylogenetics" targeting Molecular Ecology or Bioinformatics Application Note
-2. **WASM demo** — Browser-based interactive Felsenstein Zone visualization
-3. **Performance benchmarking** — Compare phylip-rs against IQ-TREE, RAxML-NG, PAUP* on standard datasets
-4. **Software catalog preservation** — Scrape and archive the 392+ entries from Felsenstein's software catalog before links rot
-5. **Cross-domain demonstrations** — More examples applying PHYLIP algorithms outside phylogenetics (tumor phylogenetics, cultural evolution)
-6. **Community engagement** — Share with Joe Felsenstein, phylogenetics community
+### Remaining
+- **Figures 1-2** — Workflow schematic and algorithmic discovery panels (require manual/programmatic creation)
+- **Manuscript revision** — Polish, expand to full word budget, finalize references
+- **Community engagement** — Share with Joe Felsenstein, phylogenetics community
+- **Submission** — Final polish, cover letter, Nature Methods submission

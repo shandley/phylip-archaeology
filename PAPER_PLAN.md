@@ -2,11 +2,11 @@
 
 **Working Title:** "LLM-Assisted Archaeological Bioinformatics: Recovering the Algorithmic Legacy of PHYLIP"
 
-**Target Journal:** Nature Methods (Analysis article)
+**Target Journal:** Nature Methods (Article — not Analysis, which is for benchmarking existing tools)
 
-**Status:** Planning
+**Status:** Manuscript drafted (manuscript/manuscript.md)
 
-**Last Updated:** 2026-02-18
+**Last Updated:** 2026-02-20
 
 ---
 
@@ -16,7 +16,7 @@ Large language models can serve as archaeological instruments for legacy scienti
 
 ## 2. Why Nature Methods
 
-Nature Methods publishes Analysis articles introducing new computational methodologies for biological research. This paper introduces **LLM-assisted code archaeology** as a methodology, demonstrated on phylogenetics but applicable to any field with legacy scientific software. The contributions are:
+Nature Methods publishes Articles introducing new computational methodologies for biological research. (Note: "Analysis" articles are specifically for benchmarking existing tools, which is not our primary contribution.) This paper introduces **LLM-assisted code archaeology** as a methodology, demonstrated on phylogenetics but applicable to any field with legacy scientific software. The contributions are:
 
 - A new methodology (LLM as archaeological tool for scientific code)
 - Concrete algorithmic discoveries recovered from legacy code
@@ -50,10 +50,11 @@ The audience extends beyond phylogenetics to anyone maintaining or inheriting le
 - **Cross-disciplinary connections:** Each algorithm connects to a different field (electrical engineering, information geometry, combinatorial optimization, algebraic geometry, coding theory)
 
 ### Pillar 3: Code Preservation and Cataloging
-- **Felsenstein's software catalog:** 392+ phylogenetics tools curated since the 1980s, many with broken links
-- **Preservation status:** How many links are dead? How much software has been lost?
+- **Felsenstein's software catalog:** 407 phylogenetics tools curated since the 1980s
+- **Preservation status:** 196 archived (48%), 137 dormant (34%), 34 dead (8%), 40 unknown (10%); 23 permanently lost
 - **Archival approach:** Systematic scraping, Wayback Machine cross-referencing, metadata extraction
 - **The broader problem:** Scientific software as cultural heritage — what happens when maintainers retire?
+- **STATUS: COMPLETE** — Figure 4 generated (catalog/analysis/figures/)
 
 ### Pillar 4: Historical Perspective
 - Felsenstein's pruning algorithm (1981) anticipated belief propagation (Pearl, 1988) by 7 years
@@ -67,7 +68,7 @@ The audience extends beyond phylogenetics to anyone maintaining or inheriting le
 ### Abstract (150 words)
 - Problem: Legacy scientific software contains algorithmic knowledge at risk of being lost
 - Approach: LLM-assisted code archaeology applied to PHYLIP
-- Results: 20 algorithmic insights recovered, validated Rust reimplementation (35K+ lines, 959 tests), connections to 10+ fields outside phylogenetics
+- Results: 20 algorithmic insights recovered, validated Rust reimplementation (36,745 lines, 961 tests), connections to 10+ fields outside phylogenetics
 - Impact: New methodology for computational science preservation
 
 ### Introduction (~500 words)
@@ -95,7 +96,7 @@ The audience extends beyond phylogenetics to anyone maintaining or inheriting le
   5. Felsenstein Zone (the most famous result, good for accessibility)
 
 **Validated reimplementation**
-- 35,805 lines of Rust, 959 tests, zero dependencies
+- 36,745 lines of Rust, 961 tests, zero dependencies
 - ~30/36 PHYLIP programs covered
 - Performance characteristics vs. original C code
 - What validation against known analytical results looks like
@@ -106,9 +107,12 @@ The audience extends beyond phylogenetics to anyone maintaining or inheriting le
 - Metadata analysis: publication dates, citation patterns, technology evolution
 
 **Benchmarking against modern tools**
-- phylip-rs vs. IQ-TREE, RAxML-NG, PAUP*, MrBayes on standard datasets
-- Not claiming performance parity — positioning as pedagogical/archival
-- But: where does the simple, clean implementation actually hold up?
+- phylip-rs vs IQ-TREE 3, RAxML-NG, VeryFastTree on 36 simulated JC69 datasets (180 runs)
+- Small datasets (10-20 taxa): phylip-rs finds identical optima as modern tools
+- Large (100+ taxa): phylip-rs ML times out — quantifies the 40-year engineering gap
+- phylip-rs uses 18x less memory than IQ-TREE (3.9 MB vs 54.5 MB)
+- Not claiming performance parity — measuring what 40 years of heuristic engineering buys
+- **STATUS: COMPLETE** — Figure 5 generated (benchmarks/figures/)
 
 ### Discussion (~500 words)
 - LLM-assisted code archaeology as a general methodology
@@ -159,30 +163,22 @@ The audience extends beyond phylogenetics to anyone maintaining or inheriting le
 
 ### High Priority (Required for Paper)
 
-#### A. Software Catalog Analysis
-- [ ] Scrape all 392+ entries from Felsenstein's catalog page
-- [ ] Check each link: alive, dead, redirected, archived (Wayback Machine)
-- [ ] Extract metadata: name, author, year, language, method type, citation count
-- [ ] Categorize by method type (ML, parsimony, distance, Bayesian, etc.)
-- [ ] Analyze temporal patterns: when were tools created, when did they die?
-- [ ] Identify the "lost" tools — important algorithms with no surviving code
-- [ ] Create visualization of the catalog's health
+#### A. Software Catalog Analysis — COMPLETE
+- [x] Scrape all 407 entries from Felsenstein's catalog page
+- [x] Check each link: alive, dead, redirected, archived (Wayback Machine)
+- [x] Extract metadata: name, author, year, language, method type, citation count
+- [x] Categorize by method type (ML, parsimony, distance, Bayesian, etc.)
+- [x] Analyze temporal patterns: when were tools created, when did they die?
+- [x] Identify the "lost" tools — 23 permanently lost
+- [x] Create visualization of the catalog's health (Figure 4: 3-panel)
 
-#### B. Benchmarking
-- [ ] Select standard benchmark datasets:
-  - Small: 10-20 taxa (validation, all methods)
-  - Medium: 50-100 taxa (ML, NJ, parsimony)
-  - Large: 500+ taxa (scaling behavior)
-  - Simulated: known true tree for accuracy measurement
-- [ ] Benchmark against:
-  - IQ-TREE 2 (current ML standard)
-  - RAxML-NG (alternative ML)
-  - PAUP* (classic reference, if available)
-  - FastTree 2 (approximate ML)
-  - Original PHYLIP (if we can compile it)
-- [ ] Metrics: wall time, memory, log-likelihood, Robinson-Foulds to true tree
-- [ ] Run on Apple Silicon (our environment) and document
-- [ ] Note: we are NOT claiming performance competitiveness — framing is "pedagogical implementation that is nonetheless functional"
+#### B. Benchmarking — COMPLETE
+- [x] Select standard benchmark datasets: 36 datasets (10/20/50/100/200/500 taxa, 500-5000 sites)
+- [x] Benchmark against: IQ-TREE 3, RAxML-NG, VeryFastTree (plus phylip-rs ML and NJ)
+- [x] Metrics: wall time, memory (gtime), log-likelihood (scored under JC69), Robinson-Foulds to true tree
+- [x] Run on Apple Silicon (M4), single-threaded, 600s timeout
+- [x] All 180 runs complete (benchmarks/results/benchmark_results.csv)
+- [x] Figure 5 generated (benchmarks/figures/)
 
 #### C. LLM Process Documentation
 - [ ] Review conversation logs from this project
@@ -287,16 +283,16 @@ The audience extends beyond phylogenetics to anyone maintaining or inheriting le
 | Reviewers want more than phylogenetics | Include cross-domain demonstrations and discuss generalizability |
 | "Why Rust?" question | Zero-dependency constraint forces understanding of every algorithm; Rust's type system catches errors; performance is adequate |
 
-## 9. Timeline (Tentative)
+## 9. Timeline
 
-| Phase | Tasks | Duration |
-|-------|-------|----------|
-| **Phase 1: Additional analysis** | Software catalog scraping, benchmarking setup, LLM process documentation | 2-3 weeks |
-| **Phase 2: Validation** | Original PHYLIP comparison, cross-domain demos | 1-2 weeks |
-| **Phase 3: Figures** | Create all 6 figures | 1-2 weeks |
-| **Phase 4: Writing** | Draft manuscript | 2-3 weeks |
-| **Phase 5: Review** | Internal review, feedback from Felsenstein (if invited) | 2-4 weeks |
-| **Phase 6: Submission** | Final polish, cover letter, submission | 1 week |
+| Phase | Tasks | Status |
+|-------|-------|--------|
+| **Phase 1: Additional analysis** | Software catalog scraping, benchmarking | COMPLETE |
+| **Phase 2: Writing** | Draft manuscript | COMPLETE (first draft) |
+| **Phase 3: Figures** | Create all figures | Figures 3-4 complete; Figures 1-2 needed |
+| **Phase 4: Revision** | Polish manuscript, expand, finalize references | Next |
+| **Phase 5: Review** | Internal review, feedback from Felsenstein (if invited) | Pending |
+| **Phase 6: Submission** | Final polish, cover letter, submission | Pending |
 
 ## 10. Key References to Cite
 
