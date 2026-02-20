@@ -1,0 +1,7 @@
+# Regenerable datasets (use generate_data.py)
+datasets/*.fasta
+datasets/*.nwk
+
+# Python environment
+.venv/
+__pycache__/
