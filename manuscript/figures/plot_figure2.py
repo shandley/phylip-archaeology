@@ -264,17 +264,21 @@ def draw_panel_a(ax):
             ax.plot(x, y, "o", color="grey", markersize=3.5,
                     transform=ax.transAxes, clip_on=False, zorder=5)
 
-    # Message-passing arrows (along branches, from child toward parent)
+    # Message-passing arrows (along vertical part of each branch, child→parent)
     arrow_color = "#009E73"
     for child, parent in edges:
         cx, cy = nodes[child]
         px, py = nodes[parent]
-        mid_y = (cy + py) / 2
-        dx = 0.013
+        # Arrow runs along vertical segment from child upward
+        arrow_bot = cy + 0.03
+        arrow_top = py - 0.03
+        if arrow_top - arrow_bot < 0.04:
+            continue  # skip if branch too short
+        dx = 0.015  # slight offset so arrow doesn't hide the branch
         ax.annotate(
-            "", xy=(cx + dx, mid_y + 0.06), xytext=(cx + dx, mid_y - 0.06),
+            "", xy=(cx + dx, arrow_top), xytext=(cx + dx, arrow_bot),
             xycoords="axes fraction", textcoords="axes fraction",
-            arrowprops=dict(arrowstyle="-|>", color=arrow_color, lw=0.7),
+            arrowprops=dict(arrowstyle="-|>", color=arrow_color, lw=0.8),
         )
 
     # Leaf labels
@@ -363,45 +367,42 @@ def draw_panel_b(ax):
     # Use plain text in a column layout, with monospace numbers right-aligned.
     # Use separate text calls per column to control alignment precisely.
 
-    # Column positions (axes fraction x-coords for left edge of each column)
-    c0_x = 0.52   # junction (left-aligned)
-    c1_x = 0.72   # Felsenstein (left-aligned, monospace)
-    c2_x = 0.88   # Kirchhoff (left-aligned, monospace)
+    # Comparison table — right half of panel
+    # Compact 2-column layout: "Contrasts" header, then Felsenstein | Kirchhoff
+    tbl_x = 0.54
+    tbl_top = 0.68
+    row_h = 0.08
 
-    tbl_top = 0.65
-    row_h = 0.075
+    ax.text(tbl_x + 0.22, tbl_top + 0.06, "Standardized contrasts",
+            ha="center", va="top", fontsize=5.5, fontweight="bold",
+            transform=ax.transAxes)
 
-    # Headers
-    ax.text(c0_x, tbl_top, "Junction", ha="left", va="top",
+    # Column headers
+    ax.text(tbl_x, tbl_top, "Junction", ha="left", va="top",
             fontsize=5, fontweight="bold", transform=ax.transAxes)
-    ax.text(c1_x, tbl_top, "Felsenstein", ha="center", va="top",
+    ax.text(tbl_x + 0.42, tbl_top, "Value", ha="right", va="top",
             fontsize=5, fontweight="bold", transform=ax.transAxes)
-    ax.text(c2_x, tbl_top, "Kirchhoff", ha="center", va="top",
-            fontsize=5, fontweight="bold", transform=ax.transAxes)
-    # Header underline
-    ax.plot([c0_x, 0.98], [tbl_top - 0.018, tbl_top - 0.018],
+    ax.plot([tbl_x, tbl_x + 0.44], [tbl_top - 0.016, tbl_top - 0.016],
             color="grey", linewidth=0.4, transform=ax.transAxes, clip_on=False)
 
-    # Data rows
+    # Data rows — identical values prove the equivalence
     rows = [
-        ("A-B",     "-2.236068", "-2.236068"),
-        ("D-E",      "2.390457",  "2.390457"),
-        ("C-DE",    "-4.190279", "-4.190279"),
-        ("AB-CDE",   "0.434230",  "0.434230"),
+        ("A \u2013 B",     "\u22122.236068"),
+        ("D \u2013 E",     "+2.390457"),
+        ("C \u2013 DE",    "\u22124.190279"),
+        ("AB \u2013 CDE",  "+0.434230"),
     ]
-    for r, (junc, f_val, k_val) in enumerate(rows):
+    for r, (junc, val) in enumerate(rows):
         y = tbl_top - (r + 1) * row_h
-        ax.text(c0_x, y, junc, ha="left", va="top",
-                fontsize=4.5, family="monospace", transform=ax.transAxes)
-        ax.text(c1_x, y, f_val, ha="center", va="top",
-                fontsize=4.5, family="monospace", transform=ax.transAxes)
-        ax.text(c2_x, y, k_val, ha="center", va="top",
-                fontsize=4.5, family="monospace", transform=ax.transAxes)
+        ax.text(tbl_x, y, junc, ha="left", va="top",
+                fontsize=5, transform=ax.transAxes)
+        ax.text(tbl_x + 0.42, y, val, ha="right", va="top",
+                fontsize=5, family="monospace", transform=ax.transAxes)
 
-    # "Match to 10 decimal places" below table
-    ax.text(0.75, tbl_top - 5 * row_h + 0.015,
-            "Match to 10 decimal places",
-            ha="center", va="top", fontsize=5.5, style="italic",
+    # Equivalence note
+    ax.text(tbl_x + 0.22, tbl_top - 5 * row_h + 0.02,
+            "Felsenstein = Kirchhoff\nto 8+ decimal places",
+            ha="center", va="top", fontsize=5, style="italic",
             color="#009E73", transform=ax.transAxes)
 
     # Key formula at bottom of panel
@@ -421,13 +422,13 @@ def draw_panel_b(ax):
 def draw_panel_c(fig, gs_cell):
     """Panel c occupies one gridspec cell but has two sub-panels."""
     inner = gridspec.GridSpecFromSubplotSpec(
-        1, 2, subplot_spec=gs_cell, width_ratios=[1.1, 0.9], wspace=0.65,
+        1, 2, subplot_spec=gs_cell, width_ratios=[1.2, 0.8], wspace=0.45,
     )
     ax_heat = fig.add_subplot(inner[0])
     ax_hist = fig.add_subplot(inner[1])
 
-    # Place "c" label slightly higher and further left to avoid heatmap overlap
-    ax_heat.text(-0.18, 1.08, "c", transform=ax_heat.transAxes,
+    # Place "c" label
+    ax_heat.text(-0.12, 1.08, "c", transform=ax_heat.transAxes,
                  fontsize=10, fontweight="bold", va="top")
 
     # --- Heatmap ---
@@ -439,19 +440,19 @@ def draw_panel_c(fig, gs_cell):
 
     ax_heat.set_xticks(range(20))
     ax_heat.set_yticks(range(20))
-    ax_heat.set_xticklabels(AA_ORDER, fontsize=5)
-    ax_heat.set_yticklabels(AA_ORDER, fontsize=5)
+    ax_heat.set_xticklabels(AA_ORDER, fontsize=5.5)
+    ax_heat.set_yticklabels(AA_ORDER, fontsize=5.5)
     ax_heat.tick_params(length=0, pad=2)
-    ax_heat.set_title("Genetic code step matrix\nand optimization",
+    ax_heat.set_title("Genetic code step matrix",
                        fontsize=8, pad=6)
 
-    # Colorbar -- place below the heatmap to avoid overlapping the histogram
+    # Colorbar -- vertical on right side to save vertical space
     cbar = fig.colorbar(im, ax=ax_heat, ticks=[0, 1, 2, 3],
-                         orientation="horizontal",
-                         fraction=0.06, pad=0.12, shrink=0.8)
-    cbar.ax.set_xticklabels(["0", "1", "2", "3"], fontsize=5)
-    cbar.ax.set_xlabel("Min. nucleotide substitutions", fontsize=5.5,
-                         labelpad=2)
+                         orientation="vertical",
+                         fraction=0.046, pad=0.04, shrink=0.8)
+    cbar.ax.set_yticklabels(["0", "1", "2", "3"], fontsize=5.5)
+    cbar.set_label("Min. nucleotide\nsubstitutions", fontsize=5.5,
+                    labelpad=4)
     cbar.outline.set_linewidth(0.4)
 
     # Restore spines for heatmap (overridden by rcParams)
@@ -530,11 +531,14 @@ def draw_panel_d(ax):
 # ===========================================================================
 
 def main():
-    fig = plt.figure(figsize=(180 / 25.4, 160 / 25.4))
+    fig = plt.figure(figsize=(180 / 25.4, 175 / 25.4))
+    # Asymmetric: left column wider for heatmap, bottom row taller
     gs = gridspec.GridSpec(
         2, 2, figure=fig,
-        hspace=0.50, wspace=0.38,
-        left=0.10, right=0.96, top=0.94, bottom=0.07,
+        height_ratios=[0.85, 1.15],
+        width_ratios=[1.3, 1.0],
+        hspace=0.50, wspace=0.40,
+        left=0.08, right=0.96, top=0.94, bottom=0.06,
     )
 
     # Panel (a) -- top-left
@@ -545,7 +549,7 @@ def main():
     ax_b = fig.add_subplot(gs[0, 1])
     draw_panel_b(ax_b)
 
-    # Panel (c) -- bottom-left (has sub-panels, pass gridspec cell)
+    # Panel (c) -- bottom-left (heatmap + histogram sub-panels)
     draw_panel_c(fig, gs[1, 0])
 
     # Panel (d) -- bottom-right

@@ -87,8 +87,8 @@ PHASES = [
     },
     {
         "num": 4,
-        "title": "Reimplementation",
-        "desc": "Modern implementation\nwith validation tests",
+        "title": "Reimplementation\n& Validation",
+        "desc": "Modern implementation\ntested against analytical results",
     },
     {
         "num": 5,
@@ -172,10 +172,10 @@ def _draw_straight_arrow(ax, x1, y1, x2, y2):
     arrow = FancyArrowPatch(
         (x1, y1),
         (x2, y2),
-        arrowstyle="-|>,head_width=4,head_length=3",
+        arrowstyle="-|>,head_width=5,head_length=4",
         connectionstyle="arc3,rad=0.0",
         color=ARROW_COLOR,
-        linewidth=1.2,
+        linewidth=1.5,
         zorder=5,
         mutation_scale=1,
     )
