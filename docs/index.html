@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phylogenetics Software Catalog — PHYLIP Archaeology</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  :root {
+    --sky: #56B4E9;
+    --orange: #E69F00;
+    --vermillion: #D55E00;
+    --gray: #999999;
+    --blue: #0072B2;
+    --green: #009E73;
+    --yellow: #F0E442;
+    --pink: #CC79A7;
+    --bg: #fafafa;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.5; padding: 0;
+  }
+  header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: white; padding: 2rem 1.5rem; text-align: center;
+  }
+  header h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.3rem; }
+  header p { color: #94a3b8; font-size: 0.95rem; max-width: 700px; margin: 0 auto; }
+  .stats-banner {
+    display: flex; justify-content: center; gap: 2rem;
+    margin-top: 1.2rem; flex-wrap: wrap;
+  }
+  .stat-box { text-align: center; }
+  .stat-box .num { font-size: 2rem; font-weight: 700; color: var(--sky); }
+  .stat-box .label { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+  .stat-box.warn .num { color: var(--vermillion); }
+  main { max-width: 1100px; margin: 0 auto; padding: 1.5rem; }
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.2rem; margin-bottom: 1.2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card h2 { font-size: 1.1rem; margin-bottom: 0.8rem; color: var(--text); }
+  .charts-row { display: grid; grid-template-columns: 2fr 1fr; gap: 1.2rem; }
+  @media (max-width: 768px) { .charts-row { grid-template-columns: 1fr; } }
+
+  /* Timeline chart */
+  #timeline svg { width: 100%; }
+  .bar-segment { cursor: pointer; opacity: 0.9; transition: opacity 0.15s; }
+  .bar-segment:hover { opacity: 1; stroke: #333; stroke-width: 1; }
+  .axis text { font-size: 11px; fill: var(--muted); }
+  .axis line, .axis path { stroke: var(--border); }
+
+  /* Status chart */
+  #status-chart svg { width: 100%; }
+  .arc-segment { cursor: pointer; transition: opacity 0.15s; }
+  .arc-segment:hover { opacity: 0.85; }
+
+  /* Legend */
+  .legend { display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 0.5rem; font-size: 0.82rem; }
+  .legend-item { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+  .legend-swatch { width: 12px; height: 12px; border-radius: 2px; flex-shrink: 0; }
+
+  /* Filters */
+  .filters {
+    display: flex; gap: 0.8rem; flex-wrap: wrap; align-items: center;
+    margin-bottom: 1rem;
+  }
+  .filters input[type="text"] {
+    padding: 0.45rem 0.7rem; border: 1px solid var(--border); border-radius: 6px;
+    font-size: 0.9rem; width: 220px; outline: none;
+  }
+  .filters input[type="text"]:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,114,178,0.15); }
+  .filters select {
+    padding: 0.45rem 0.5rem; border: 1px solid var(--border); border-radius: 6px;
+    font-size: 0.85rem; background: white; outline: none; cursor: pointer;
+  }
+  .filter-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: #e0f2fe; color: var(--blue); border-radius: 12px;
+    padding: 0.2rem 0.6rem; font-size: 0.8rem; cursor: pointer;
+  }
+  .filter-tag:hover { background: #bae6fd; }
+  .filter-tag .x { font-weight: 700; }
+  .result-count { font-size: 0.85rem; color: var(--muted); margin-left: auto; }
+
+  /* Table */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+  thead th {
+    text-align: left; padding: 0.6rem 0.5rem; border-bottom: 2px solid var(--border);
+    font-weight: 600; color: var(--muted); font-size: 0.78rem;
+    text-transform: uppercase; letter-spacing: 0.04em;
+    cursor: pointer; user-select: none; white-space: nowrap;
+  }
+  thead th:hover { color: var(--text); }
+  thead th .sort-arrow { font-size: 0.7rem; margin-left: 2px; }
+  tbody tr { border-bottom: 1px solid var(--border); transition: background 0.1s; }
+  tbody tr:hover { background: #f8fafc; }
+  tbody td { padding: 0.5rem; vertical-align: top; }
+  .badge {
+    display: inline-block; padding: 0.15rem 0.5rem; border-radius: 10px;
+    font-size: 0.75rem; font-weight: 600; white-space: nowrap;
+  }
+  .badge-archived { background: #dbeafe; color: #1e40af; }
+  .badge-dormant { background: #fef3c7; color: #92400e; }
+  .badge-dead { background: #fee2e2; color: #991b1b; }
+  .badge-unknown { background: #f3f4f6; color: #6b7280; }
+  .tool-name { font-weight: 600; color: var(--text); }
+  .tool-year { color: var(--muted); font-size: 0.82rem; }
+  .tool-cats { font-size: 0.78rem; color: var(--muted); }
+  .tool-lang { font-size: 0.78rem; }
+  a.url-link {
+    font-size: 0.78rem; color: var(--blue); text-decoration: none;
+    display: inline-block; margin-right: 0.5rem;
+  }
+  a.url-link:hover { text-decoration: underline; }
+  a.url-link.wayback { color: var(--orange); }
+  .expand-btn {
+    background: none; border: none; cursor: pointer; font-size: 0.8rem;
+    color: var(--blue); padding: 0;
+  }
+  .expand-btn:hover { text-decoration: underline; }
+  .detail-row td { padding: 0.5rem; background: #f8fafc; }
+  .detail-text { font-size: 0.82rem; color: var(--muted); max-width: 800px; line-height: 1.6; }
+
+  /* Pagination */
+  .pagination {
+    display: flex; justify-content: center; align-items: center;
+    gap: 0.3rem; margin-top: 1rem;
+  }
+  .pagination button {
+    padding: 0.3rem 0.6rem; border: 1px solid var(--border); border-radius: 4px;
+    background: white; cursor: pointer; font-size: 0.82rem;
+  }
+  .pagination button:hover { background: #f1f5f9; }
+  .pagination button.active { background: var(--blue); color: white; border-color: var(--blue); }
+  .pagination button:disabled { opacity: 0.4; cursor: default; }
+
+  footer {
+    text-align: center; padding: 2rem 1rem; font-size: 0.82rem;
+    color: var(--muted); border-top: 1px solid var(--border); margin-top: 2rem;
+  }
+  footer a { color: var(--blue); text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+
+  .tooltip {
+    position: absolute; background: rgba(0,0,0,0.85); color: white;
+    padding: 0.4rem 0.6rem; border-radius: 4px; font-size: 0.78rem;
+    pointer-events: none; white-space: nowrap; z-index: 100;
+    opacity: 0; transition: opacity 0.15s;
+  }
+
+  .loading { text-align: center; padding: 3rem; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Phylogenetics Software Catalog</h1>
+  <p>An interactive explorer of Joe Felsenstein's hand-curated catalog of 407 phylogenetics tools, preserved and analyzed as part of the <a href="https://github.com/shandley/phylip-archaeology" style="color:var(--sky)">PHYLIP Archaeology</a> project.</p>
+  <div class="stats-banner" id="stats-banner"></div>
+</header>
+
+<main>
+  <div class="charts-row">
+    <div class="card" id="timeline-card">
+      <h2>Timeline of Software Development</h2>
+      <div id="timeline"></div>
+      <div class="legend" id="timeline-legend"></div>
+    </div>
+    <div class="card" id="status-card">
+      <h2>Preservation Status</h2>
+      <div id="status-chart"></div>
+      <div class="legend" id="status-legend"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Software Catalog</h2>
+    <div class="filters" id="filters">
+      <input type="text" id="search" placeholder="Search tools...">
+      <select id="filter-status"><option value="">All statuses</option></select>
+      <select id="filter-category"><option value="">All categories</option></select>
+      <select id="filter-language"><option value="">All languages</option></select>
+      <select id="filter-era"><option value="">All eras</option></select>
+      <div id="active-filters"></div>
+      <span class="result-count" id="result-count"></span>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-sort="name">Name <span class="sort-arrow"></span></th>
+            <th data-sort="status">Status <span class="sort-arrow"></span></th>
+            <th data-sort="first_release">Year <span class="sort-arrow"></span></th>
+            <th data-sort="categories">Categories</th>
+            <th data-sort="languages">Language</th>
+            <th>Links</th>
+          </tr>
+        </thead>
+        <tbody id="table-body"></tbody>
+      </table>
+    </div>
+    <div class="pagination" id="pagination"></div>
+  </div>
+</main>
+
+<footer>
+  Catalog data from <a href="https://phylipweb.github.io/phylip/software.html">Felsenstein's Phylogeny Programs</a>.
+  Status verified February 2026.
+  Part of <a href="https://github.com/shandley/phylip-archaeology">PHYLIP Archaeology</a>
+  &mdash; LLM-assisted code archaeology of legacy phylogenetics software.
+</footer>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const STATUS_COLORS = {
+  archived: '#56B4E9',
+  dormant: '#E69F00',
+  dead: '#D55E00',
+  unknown: '#999999'
+};
+const STATUS_LABELS = {
+  archived: 'Archived',
+  dormant: 'Dormant',
+  dead: 'Dead',
+  unknown: 'Unknown'
+};
+const CAT_COLORS = {
+  parsimony: '#E69F00',
+  distance: '#56B4E9',
+  likelihood: '#009E73',
+  bayesian: '#CC79A7',
+  other: '#999999'
+};
+const PER_PAGE = 25;
+let allTools = [];
+let filteredTools = [];
+let currentPage = 0;
+let sortCol = 'name';
+let sortAsc = true;
+let activeFilters = { status: '', category: '', language: '', era: '', search: '' };
+let expandedRows = new Set();
+
+async function init() {
+  const [tools, stats] = await Promise.all([
+    fetch('data/tools_enriched.json').then(r => r.json()),
+    fetch('data/narrative_stats.json').then(r => r.json())
+  ]);
+  allTools = tools;
+  renderBanner(stats);
+  renderTimeline(stats, tools);
+  renderStatusChart(stats);
+  populateFilters(tools);
+  applyFilters();
+  setupEvents();
+}
+
+function renderBanner(stats) {
+  const items = [
+    { num: stats.total_tools, label: 'Tools Cataloged' },
+    { num: stats.tools_with_year, label: 'With Known Year' },
+    { num: stats.wayback_archived, label: 'Wayback Preserved' },
+    { num: stats.dead_no_archive, label: 'Permanently Lost', warn: true }
+  ];
+  document.getElementById('stats-banner').innerHTML = items.map(d =>
+    `<div class="stat-box${d.warn ? ' warn' : ''}">
+      <div class="num">${d.num}</div><div class="label">${d.label}</div>
+    </div>`
+  ).join('');
+}
+
+function renderTimeline(stats, tools) {
+  const container = document.getElementById('timeline');
+  const width = container.clientWidth;
+  const height = 220;
+  const margin = { top: 15, right: 15, bottom: 35, left: 40 };
+  const iw = width - margin.left - margin.right;
+  const ih = height - margin.top - margin.bottom;
+
+  const svg = d3.select('#timeline').append('svg')
+    .attr('viewBox', `0 0 ${width} ${height}`);
+  const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+  const eras = Object.keys(stats.temporal_bins_5yr).sort();
+  const statuses = ['archived', 'dormant', 'dead', 'unknown'];
+
+  // Build stacked data from era_status
+  const data = eras.map(era => {
+    const row = { era };
+    const es = stats.era_status[era] || {};
+    statuses.forEach(s => row[s] = es[s] || 0);
+    return row;
+  });
+
+  const stack = d3.stack().keys(statuses);
+  const series = stack(data);
+
+  const x = d3.scaleBand().domain(eras).range([0, iw]).padding(0.25);
+  const y = d3.scaleLinear()
+    .domain([0, d3.max(data, d => statuses.reduce((s, k) => s + d[k], 0))])
+    .nice().range([ih, 0]);
+
+  g.append('g').attr('class', 'axis').attr('transform', `translate(0,${ih})`)
+    .call(d3.axisBottom(x).tickSizeOuter(0))
+    .selectAll('text').attr('font-size', '10px')
+    .text(d => d.replace('-', '\u2013'));
+
+  g.append('g').attr('class', 'axis')
+    .call(d3.axisLeft(y).ticks(5).tickSizeOuter(0));
+
+  g.append('text').attr('x', -margin.left + 4).attr('y', -4)
+    .attr('font-size', '11px').attr('fill', '#6b7280').text('Tools');
+
+  const tooltip = document.getElementById('tooltip');
+
+  series.forEach(s => {
+    g.selectAll(`.bar-${s.key}`)
+      .data(s).join('rect')
+      .attr('class', 'bar-segment')
+      .attr('x', d => x(d.data.era))
+      .attr('y', d => y(d[1]))
+      .attr('width', x.bandwidth())
+      .attr('height', d => y(d[0]) - y(d[1]))
+      .attr('fill', STATUS_COLORS[s.key])
+      .on('mouseenter', (e, d) => {
+        const count = d[1] - d[0];
+        if (count === 0) return;
+        tooltip.style.opacity = 1;
+        tooltip.innerHTML = `${d.data.era}: ${count} ${STATUS_LABELS[s.key].toLowerCase()}`;
+      })
+      .on('mousemove', e => {
+        tooltip.style.left = (e.pageX + 10) + 'px';
+        tooltip.style.top = (e.pageY - 30) + 'px';
+      })
+      .on('mouseleave', () => { tooltip.style.opacity = 0; })
+      .on('click', (e, d) => {
+        const count = d[1] - d[0];
+        if (count === 0) return;
+        setFilter('era', d.data.era);
+        setFilter('status', s.key);
+      });
+  });
+
+  // Legend
+  const legend = document.getElementById('timeline-legend');
+  legend.innerHTML = statuses.map(s =>
+    `<div class="legend-item" data-status="${s}">
+      <div class="legend-swatch" style="background:${STATUS_COLORS[s]}"></div>
+      ${STATUS_LABELS[s]}
+    </div>`
+  ).join('');
+}
+
+function renderStatusChart(stats) {
+  const container = document.getElementById('status-chart');
+  const size = Math.min(container.clientWidth, 220);
+  const radius = size / 2 - 10;
+
+  const svg = d3.select('#status-chart').append('svg')
+    .attr('viewBox', `0 0 ${size} ${size}`)
+    .append('g').attr('transform', `translate(${size/2},${size/2})`);
+
+  const statuses = ['archived', 'dormant', 'dead', 'unknown'];
+  const data = statuses.map(s => ({
+    status: s,
+    count: stats[`status_${s}`],
+    label: STATUS_LABELS[s]
+  }));
+
+  const pie = d3.pie().value(d => d.count).sort(null);
+  const arc = d3.arc().innerRadius(radius * 0.55).outerRadius(radius);
+  const tooltip = document.getElementById('tooltip');
+
+  svg.selectAll('path').data(pie(data)).join('path')
+    .attr('class', 'arc-segment')
+    .attr('d', arc)
+    .attr('fill', d => STATUS_COLORS[d.data.status])
+    .on('mouseenter', (e, d) => {
+      const pct = ((d.data.count / stats.total_tools) * 100).toFixed(1);
+      tooltip.style.opacity = 1;
+      tooltip.innerHTML = `${d.data.label}: ${d.data.count} (${pct}%)`;
+    })
+    .on('mousemove', e => {
+      tooltip.style.left = (e.pageX + 10) + 'px';
+      tooltip.style.top = (e.pageY - 30) + 'px';
+    })
+    .on('mouseleave', () => { tooltip.style.opacity = 0; })
+    .on('click', (e, d) => setFilter('status', d.data.status));
+
+  // Center text
+  svg.append('text').attr('text-anchor', 'middle').attr('dy', '-0.3em')
+    .attr('font-size', '1.8rem').attr('font-weight', '700').attr('fill', '#1a1a2e')
+    .text(stats.total_tools);
+  svg.append('text').attr('text-anchor', 'middle').attr('dy', '1.2em')
+    .attr('font-size', '0.7rem').attr('fill', '#6b7280').text('tools');
+
+  // Legend
+  const legend = document.getElementById('status-legend');
+  legend.innerHTML = data.map(d =>
+    `<div class="legend-item" data-status="${d.status}">
+      <div class="legend-swatch" style="background:${STATUS_COLORS[d.status]}"></div>
+      ${d.label} (${d.count})
+    </div>`
+  ).join('');
+}
+
+function populateFilters(tools) {
+  const statuses = [...new Set(tools.map(t => t.status))].sort();
+  const cats = [...new Set(tools.flatMap(t => t.categories || []))].sort();
+  const langs = [...new Set(tools.flatMap(t => t.languages || []))].sort();
+  const eras = [...new Set(tools.filter(t => t.first_release).map(t => getEra(t.first_release)))].sort();
+
+  fillSelect('filter-status', statuses, STATUS_LABELS);
+  fillSelect('filter-category', cats);
+  fillSelect('filter-language', langs);
+  fillSelect('filter-era', eras);
+}
+
+function fillSelect(id, values, labelMap) {
+  const sel = document.getElementById(id);
+  const defaultOpt = sel.options[0].text;
+  values.forEach(v => {
+    const opt = document.createElement('option');
+    opt.value = v;
+    opt.text = labelMap ? (labelMap[v] || v) : v;
+    sel.appendChild(opt);
+  });
+}
+
+function getEra(year) {
+  if (!year) return null;
+  const base = Math.floor((year - 1970) / 5) * 5 + 1970;
+  return `${base}-${base + 4}`;
+}
+
+function setFilter(key, value) {
+  if (activeFilters[key] === value) {
+    activeFilters[key] = '';
+  } else {
+    activeFilters[key] = value;
+  }
+  // Sync dropdowns
+  if (key === 'status') document.getElementById('filter-status').value = activeFilters.status;
+  if (key === 'category') document.getElementById('filter-category').value = activeFilters.category;
+  if (key === 'language') document.getElementById('filter-language').value = activeFilters.language;
+  if (key === 'era') document.getElementById('filter-era').value = activeFilters.era;
+  applyFilters();
+}
+
+function applyFilters() {
+  const search = activeFilters.search.toLowerCase();
+  filteredTools = allTools.filter(t => {
+    if (activeFilters.status && t.status !== activeFilters.status) return false;
+    if (activeFilters.category && !(t.categories || []).includes(activeFilters.category)) return false;
+    if (activeFilters.language && !(t.languages || []).includes(activeFilters.language)) return false;
+    if (activeFilters.era) {
+      const era = getEra(t.first_release);
+      if (era !== activeFilters.era) return false;
+    }
+    if (search) {
+      const hay = `${t.name} ${t.author || ''} ${t.description || ''} ${(t.categories||[]).join(' ')}`.toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+    return true;
+  });
+  sortTools();
+  currentPage = 0;
+  expandedRows.clear();
+  renderActiveFilters();
+  renderTable();
+  renderPagination();
+}
+
+function sortTools() {
+  filteredTools.sort((a, b) => {
+    let va = a[sortCol], vb = b[sortCol];
+    if (sortCol === 'categories') { va = (va||[]).join(','); vb = (vb||[]).join(','); }
+    if (sortCol === 'languages') { va = (va||[]).join(','); vb = (vb||[]).join(','); }
+    if (va == null) va = '';
+    if (vb == null) vb = '';
+    if (typeof va === 'string') va = va.toLowerCase();
+    if (typeof vb === 'string') vb = vb.toLowerCase();
+    if (va < vb) return sortAsc ? -1 : 1;
+    if (va > vb) return sortAsc ? 1 : -1;
+    return 0;
+  });
+}
+
+function renderActiveFilters() {
+  const box = document.getElementById('active-filters');
+  const tags = [];
+  if (activeFilters.status) tags.push({ key: 'status', label: STATUS_LABELS[activeFilters.status] || activeFilters.status });
+  if (activeFilters.category) tags.push({ key: 'category', label: activeFilters.category });
+  if (activeFilters.language) tags.push({ key: 'language', label: activeFilters.language });
+  if (activeFilters.era) tags.push({ key: 'era', label: activeFilters.era });
+  box.innerHTML = tags.map(t =>
+    `<span class="filter-tag" onclick="setFilter('${t.key}','')">${t.label} <span class="x">&times;</span></span>`
+  ).join('');
+  document.getElementById('result-count').textContent =
+    `${filteredTools.length} of ${allTools.length} tools`;
+}
+
+function renderTable() {
+  const start = currentPage * PER_PAGE;
+  const page = filteredTools.slice(start, start + PER_PAGE);
+  const tbody = document.getElementById('table-body');
+
+  tbody.innerHTML = page.map((t, i) => {
+    const idx = start + i;
+    const cats = (t.categories || []).slice(0, 3).join(', ');
+    const moreCats = (t.categories || []).length > 3 ? ` +${(t.categories||[]).length - 3}` : '';
+    const langs = (t.languages || []).join(', ') || '\u2014';
+    const links = [];
+    if (t.url_original) links.push(`<a class="url-link" href="${escHtml(t.url_original)}" target="_blank" rel="noopener">Original</a>`);
+    if (t.url_archive) links.push(`<a class="url-link wayback" href="${escHtml(t.url_archive)}" target="_blank" rel="noopener">Wayback</a>`);
+    if (!links.length) links.push('<span style="color:#ccc;font-size:0.78rem">\u2014</span>');
+
+    let row = `<tr>
+      <td>
+        <span class="tool-name">${escHtml(t.name)}</span>
+        ${t.author ? `<br><span style="font-size:0.78rem;color:var(--muted)">${escHtml(t.author)}</span>` : ''}
+      </td>
+      <td><span class="badge badge-${t.status}">${STATUS_LABELS[t.status] || t.status}</span></td>
+      <td class="tool-year">${t.first_release || '\u2014'}</td>
+      <td class="tool-cats">${escHtml(cats)}${moreCats ? `<span style="color:var(--muted)">${moreCats}</span>` : ''}</td>
+      <td class="tool-lang">${escHtml(langs)}</td>
+      <td>${links.join('')}
+        ${t.description_full ? `<br><button class="expand-btn" onclick="toggleDetail(${idx})">
+          ${expandedRows.has(idx) ? 'Hide' : 'Details'}</button>` : ''}
+      </td>
+    </tr>`;
+    if (expandedRows.has(idx) && t.description_full) {
+      row += `<tr class="detail-row"><td colspan="6"><div class="detail-text">${escHtml(t.description_full)}</div></td></tr>`;
+    }
+    return row;
+  }).join('');
+}
+
+function toggleDetail(idx) {
+  if (expandedRows.has(idx)) expandedRows.delete(idx);
+  else expandedRows.add(idx);
+  renderTable();
+}
+
+function renderPagination() {
+  const total = Math.ceil(filteredTools.length / PER_PAGE);
+  if (total <= 1) { document.getElementById('pagination').innerHTML = ''; return; }
+  const pag = document.getElementById('pagination');
+  let html = `<button ${currentPage===0?'disabled':''} onclick="goPage(${currentPage-1})">&laquo;</button>`;
+  const maxButtons = 7;
+  let start = Math.max(0, currentPage - 3);
+  let end = Math.min(total, start + maxButtons);
+  if (end - start < maxButtons) start = Math.max(0, end - maxButtons);
+  for (let i = start; i < end; i++) {
+    html += `<button class="${i===currentPage?'active':''}" onclick="goPage(${i})">${i+1}</button>`;
+  }
+  html += `<button ${currentPage>=total-1?'disabled':''} onclick="goPage(${currentPage+1})">&raquo;</button>`;
+  pag.innerHTML = html;
+}
+
+function goPage(p) {
+  currentPage = p;
+  expandedRows.clear();
+  renderTable();
+  renderPagination();
+  document.querySelector('.table-wrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function setupEvents() {
+  document.getElementById('search').addEventListener('input', e => {
+    activeFilters.search = e.target.value;
+    applyFilters();
+  });
+  ['status', 'category', 'language', 'era'].forEach(key => {
+    document.getElementById(`filter-${key}`).addEventListener('change', e => {
+      activeFilters[key] = e.target.value;
+      applyFilters();
+    });
+  });
+  document.querySelectorAll('thead th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const col = th.dataset.sort;
+      if (sortCol === col) sortAsc = !sortAsc;
+      else { sortCol = col; sortAsc = true; }
+      // Update arrows
+      document.querySelectorAll('thead th .sort-arrow').forEach(a => a.textContent = '');
+      th.querySelector('.sort-arrow').textContent = sortAsc ? ' \u25B2' : ' \u25BC';
+      sortTools();
+      renderTable();
+    });
+  });
+}
+
+init();
+</script>
+</body>
+</html>

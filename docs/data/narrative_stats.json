@@ -1,0 +1,230 @@
+{
+  "total_tools": 407,
+  "status_archived": 196,
+  "status_dormant": 137,
+  "status_dead": 34,
+  "status_unknown": 40,
+  "tools_with_url": 367,
+  "wayback_archived": 203,
+  "dead_no_archive": 23,
+  "tools_with_year": 261,
+  "tools_with_author": 368,
+  "tools_with_language": 202,
+  "peak_era": "2000-2004",
+  "peak_era_count": 89,
+  "temporal_bins_5yr": {
+    "1970-1974": 2,
+    "1975-1979": 1,
+    "1980-1984": 1,
+    "1985-1989": 5,
+    "1990-1994": 27,
+    "1995-1999": 54,
+    "2000-2004": 89,
+    "2005-2009": 68,
+    "2010-2014": 14
+  },
+  "category_counts": {
+    "distance": 114,
+    "likelihood": 97,
+    "tree-visualization": 75,
+    "bootstrap": 74,
+    "parsimony": 46,
+    "clock-dating": 40,
+    "consensus": 37,
+    "comparative-methods": 35,
+    "general-purpose": 34,
+    "simulation": 30,
+    "utility": 30,
+    "bayesian": 27,
+    "alignment": 23,
+    "recombination": 22,
+    "tree-comparison": 18,
+    "model-selection": 16,
+    "gene-duplication": 16,
+    "genomics": 16,
+    "population-genetics": 14,
+    "biogeography": 14,
+    "quartets": 14,
+    "compatibility": 11,
+    "sequence-editing": 8,
+    "host-parasite": 8,
+    "teaching": 4,
+    "network": 4,
+    "supertrees": 3
+  },
+  "language_counts": {
+    "C": 90,
+    "Java": 60,
+    "Perl": 25,
+    "Python": 15,
+    "R": 11,
+    "Matlab": 5,
+    "Pascal": 3,
+    "Fortran": 2,
+    "Visual Basic": 2
+  },
+  "platform_counts": {
+    "unix": 271,
+    "windows": 196,
+    "macos": 167,
+    "dos": 58,
+    "cross-platform": 23
+  },
+  "era_status": {
+    "1970-1974": {
+      "dormant": 1,
+      "unknown": 1
+    },
+    "1975-1979": {
+      "dormant": 1
+    },
+    "1980-1984": {
+      "dormant": 1
+    },
+    "1985-1989": {
+      "archived": 2,
+      "unknown": 2,
+      "dormant": 1
+    },
+    "1990-1994": {
+      "dormant": 7,
+      "archived": 16,
+      "dead": 2,
+      "unknown": 2
+    },
+    "1995-1999": {
+      "archived": 29,
+      "dormant": 17,
+      "dead": 5,
+      "unknown": 3
+    },
+    "2000-2004": {
+      "dormant": 36,
+      "archived": 47,
+      "dead": 6
+    },
+    "2005-2009": {
+      "dormant": 30,
+      "archived": 33,
+      "dead": 4,
+      "unknown": 1
+    },
+    "2010-2014": {
+      "dormant": 5,
+      "archived": 8,
+      "dead": 1
+    }
+  },
+  "era_categories": {
+    "1970-1974": {
+      "alignment": 2,
+      "parsimony": 1
+    },
+    "1975-1979": {},
+    "1980-1984": {
+      "bootstrap": 1,
+      "distance": 1,
+      "likelihood": 1,
+      "parsimony": 1,
+      "tree-visualization": 1
+    },
+    "1985-1989": {
+      "parsimony": 2,
+      "tree-visualization": 1,
+      "distance": 1
+    },
+    "1990-1994": {
+      "alignment": 2,
+      "bootstrap": 4,
+      "likelihood": 3,
+      "distance": 14,
+      "parsimony": 4,
+      "tree-visualization": 5
+    },
+    "1995-1999": {
+      "bayesian": 4,
+      "distance": 24,
+      "bootstrap": 12,
+      "alignment": 3,
+      "likelihood": 15,
+      "parsimony": 8,
+      "tree-visualization": 6
+    },
+    "2000-2004": {
+      "bayesian": 9,
+      "distance": 22,
+      "tree-visualization": 11,
+      "likelihood": 27,
+      "parsimony": 9,
+      "bootstrap": 18,
+      "alignment": 6
+    },
+    "2005-2009": {
+      "alignment": 3,
+      "likelihood": 20,
+      "bootstrap": 12,
+      "bayesian": 5,
+      "distance": 7,
+      "tree-visualization": 15,
+      "parsimony": 5
+    },
+    "2010-2014": {
+      "tree-visualization": 5,
+      "distance": 1,
+      "likelihood": 3,
+      "parsimony": 1,
+      "bootstrap": 1
+    }
+  },
+  "era_languages": {
+    "1970-1974": {
+      "C": 2
+    },
+    "1975-1979": {
+      "R": 1
+    },
+    "1980-1984": {
+      "C": 1
+    },
+    "1985-1989": {},
+    "1990-1994": {
+      "C": 6,
+      "Perl": 1,
+      "Java": 3
+    },
+    "1995-1999": {
+      "C": 23,
+      "Java": 2,
+      "Python": 1,
+      "R": 1,
+      "Perl": 1
+    },
+    "2000-2004": {
+      "C": 19,
+      "R": 3,
+      "Perl": 6,
+      "Java": 15
+    },
+    "2005-2009": {
+      "C": 16,
+      "Java": 23,
+      "Perl": 6,
+      "Python": 4,
+      "R": 1
+    },
+    "2010-2014": {
+      "Perl": 1,
+      "Java": 3,
+      "Python": 5,
+      "C": 2,
+      "R": 2
+    }
+  },
+  "sentences": {
+    "total": "Felsenstein's catalog documents 407 phylogenetics software tools spanning over four decades of development.",
+    "status": "Of 407 tools, 34 (8.4%) are completely unreachable, 137 (33.7%) appear dormant, and 196 (48.2%) are archived but no longer actively maintained.",
+    "preservation": "The Wayback Machine has preserved snapshots of 203 tools, but 23 tools have no archived copy and may be permanently lost.",
+    "peak": "Tool publication peaked in the 2000-2004 period with 89 tools, coinciding with the genomics revolution and the rise of Bayesian phylogenetics.",
+    "languages": "C dominates the catalog (90 tools), followed by Java (60), reflecting the computational demands of phylogenetic inference and the era in which most tools were written."
+  }
+}
