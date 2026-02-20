@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PHYLIP Algorithms — Live in Your Browser</title>
+<style>
+  :root {
+    --sky: #56B4E9;
+    --orange: #E69F00;
+    --vermillion: #D55E00;
+    --gray: #999999;
+    --blue: #0072B2;
+    --green: #009E73;
+    --yellow: #F0E442;
+    --pink: #CC79A7;
+    --bg: #fafafa;
+    --card: #ffffff;
+    --text: #1a1a2e;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.5; padding: 0;
+  }
+  header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    color: white; padding: 2rem 1.5rem; text-align: center;
+  }
+  header h1 { font-size: 1.6rem; font-weight: 700; margin-bottom: 0.3rem; }
+  header p { color: #94a3b8; font-size: 0.95rem; max-width: 700px; margin: 0 auto; }
+  header a { color: var(--sky); text-decoration: none; }
+  header a:hover { text-decoration: underline; }
+  .stats-banner {
+    display: flex; justify-content: center; gap: 2rem;
+    margin-top: 1.2rem; flex-wrap: wrap;
+  }
+  .stat-box { text-align: center; }
+  .stat-box .num { font-size: 2rem; font-weight: 700; color: var(--sky); }
+  .stat-box .label { font-size: 0.8rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+  main { max-width: 1000px; margin: 0 auto; padding: 1.5rem; }
+
+  /* Tabs */
+  .tabs {
+    display: flex; gap: 0; border-bottom: 2px solid var(--border);
+    margin-bottom: 1.2rem; flex-wrap: wrap;
+  }
+  .tab-btn {
+    padding: 0.6rem 1.1rem; border: none; background: none; cursor: pointer;
+    font-size: 0.9rem; color: var(--muted); font-weight: 500;
+    border-bottom: 2px solid transparent; margin-bottom: -2px;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active { color: var(--blue); border-bottom-color: var(--blue); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* Card */
+  .card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.2rem; margin-bottom: 1.2rem;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+  }
+  .card h2 { font-size: 1.1rem; margin-bottom: 0.8rem; color: var(--text); }
+  .card h3 { font-size: 0.95rem; margin: 0.8rem 0 0.4rem; color: var(--text); }
+
+  /* Form controls */
+  textarea {
+    width: 100%; font-family: "SF Mono", "Fira Code", monospace; font-size: 0.82rem;
+    padding: 0.7rem; border: 1px solid var(--border); border-radius: 6px;
+    resize: vertical; line-height: 1.4; background: #f8f9fa;
+  }
+  textarea:focus { border-color: var(--blue); outline: none; box-shadow: 0 0 0 2px rgba(0,114,178,0.15); }
+  select, input[type="number"] {
+    padding: 0.45rem 0.7rem; border: 1px solid var(--border); border-radius: 6px;
+    font-size: 0.9rem; outline: none;
+  }
+  select:focus, input[type="number"]:focus {
+    border-color: var(--blue); box-shadow: 0 0 0 2px rgba(0,114,178,0.15);
+  }
+  .controls { display: flex; gap: 0.8rem; align-items: center; margin: 0.8rem 0; flex-wrap: wrap; }
+  .controls label { font-size: 0.85rem; color: var(--muted); font-weight: 500; }
+  .btn {
+    padding: 0.5rem 1.2rem; border: none; border-radius: 6px;
+    font-size: 0.9rem; font-weight: 600; cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary { background: var(--blue); color: white; }
+  .btn-primary:hover { background: #005a8e; }
+  .btn-primary:disabled { background: #94a3b8; cursor: not-allowed; }
+
+  /* Results */
+  .result-box {
+    background: #f8f9fa; border: 1px solid var(--border); border-radius: 6px;
+    padding: 0.8rem; margin-top: 0.8rem; font-family: "SF Mono", "Fira Code", monospace;
+    font-size: 0.82rem; white-space: pre-wrap; word-break: break-all;
+    max-height: 400px; overflow-y: auto;
+  }
+  .result-label { font-size: 0.8rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem; }
+
+  /* Distance matrix table */
+  .matrix-table { border-collapse: collapse; font-size: 0.78rem; margin-top: 0.5rem; }
+  .matrix-table th, .matrix-table td {
+    padding: 0.3rem 0.5rem; border: 1px solid var(--border); text-align: right;
+  }
+  .matrix-table th { background: #f1f5f9; font-weight: 600; text-align: center; }
+  .matrix-table td.name { text-align: left; font-weight: 600; background: #f1f5f9; }
+
+  /* Tree SVG */
+  .tree-container { margin-top: 0.8rem; overflow-x: auto; }
+  .tree-container svg { display: block; }
+  .tree-container svg text { font-family: -apple-system, sans-serif; font-size: 12px; fill: var(--text); }
+  .tree-container svg line { stroke: var(--text); stroke-width: 1.5; }
+
+  /* Aside box */
+  .insight-box {
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border: 1px solid #bae6fd; border-left: 4px solid var(--blue);
+    border-radius: 6px; padding: 0.8rem 1rem; margin-top: 1rem;
+    font-size: 0.85rem;
+  }
+  .insight-box strong { color: var(--blue); }
+
+  /* Bar chart (Felsenstein Zone) */
+  .bar-chart { display: flex; gap: 2rem; align-items: flex-end; justify-content: center; margin: 1rem 0; }
+  .bar-group { text-align: center; }
+  .bar-pair { display: flex; gap: 4px; align-items: flex-end; height: 180px; }
+  .bar {
+    width: 40px; border-radius: 4px 4px 0 0; transition: height 0.3s;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding-top: 4px; font-size: 0.72rem; font-weight: 700; color: white;
+    min-height: 2px;
+  }
+  .bar.pars { background: var(--vermillion); }
+  .bar.ml { background: var(--green); }
+  .bar-label { font-size: 0.78rem; color: var(--muted); margin-top: 0.3rem; }
+  .bar-legend { display: flex; gap: 1.2rem; justify-content: center; margin-bottom: 0.5rem; font-size: 0.82rem; }
+  .bar-legend span::before { content: ''; display: inline-block; width: 12px; height: 12px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+  .bar-legend .pars-leg::before { background: var(--vermillion); }
+  .bar-legend .ml-leg::before { background: var(--green); }
+
+  /* Slider */
+  .slider-group { margin: 0.4rem 0; }
+  .slider-group label { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--muted); }
+  .slider-group input[type="range"] { width: 100%; }
+
+  /* Split support table */
+  .support-table { border-collapse: collapse; font-size: 0.82rem; margin-top: 0.5rem; width: 100%; }
+  .support-table th, .support-table td { padding: 0.3rem 0.6rem; border: 1px solid var(--border); }
+  .support-table th { background: #f1f5f9; font-weight: 600; text-align: left; }
+
+  .loading { color: var(--muted); font-style: italic; }
+  .error-msg { color: var(--vermillion); font-weight: 500; }
+  footer { text-align: center; padding: 2rem; color: var(--muted); font-size: 0.82rem; }
+  footer a { color: var(--blue); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>PHYLIP Algorithms &mdash; Live in Your Browser</h1>
+  <p>Run classic phylogenetic analyses powered by <strong>phylip-rs</strong>, a zero-dependency Rust reimplementation compiled to WebAssembly. No installation required.</p>
+  <div class="stats-banner">
+    <div class="stat-box"><div class="num">35,805</div><div class="label">Lines of Rust</div></div>
+    <div class="stat-box"><div class="num">0</div><div class="label">Dependencies</div></div>
+    <div class="stat-box"><div class="num">959</div><div class="label">Tests</div></div>
+    <div class="stat-box"><div class="num">~225 KB</div><div class="label">WASM Binary</div></div>
+  </div>
+  <p style="margin-top:1rem;"><a href="index.html">&larr; Back to Software Catalog</a></p>
+</header>
+
+<main>
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="nj">Distance &amp; NJ</button>
+    <button class="tab-btn" data-tab="likelihood">Likelihood</button>
+    <button class="tab-btn" data-tab="parsimony">Parsimony</button>
+    <button class="tab-btn" data-tab="felsen">Felsenstein Zone</button>
+    <button class="tab-btn" data-tab="bootstrap">Bootstrap</button>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- TAB 1: Distance & NJ -->
+  <!-- ================================================================ -->
+  <div id="tab-nj" class="tab-panel active">
+    <div class="card">
+      <h2>Distance Matrix &amp; Neighbor-Joining Tree</h2>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:0.8rem;">
+        Compute pairwise evolutionary distances and build a tree using the Neighbor-Joining algorithm (Saitou &amp; Nei, 1987).
+      </p>
+      <label class="result-label">FASTA Input</label>
+      <textarea id="nj-fasta" rows="10">>Human
+AAGCTTCACCGGCGCAGTCATTCTCATAATCGCCCACGGACTTACATCCTCATTACTATTCTGCCTAGCAAACTCAAACTACGAACGCACTCATAGTCGCATCATAATCCTCTCTCAAGGACTTCAAACTCTACTCCCACTAATAGCTTTTTGATGACTTCTAGCAAGCCTCGCTAACCT
+>Chimp
+AAGCTTCACCGGCGCAATTATCCTCATAATCGCCCACGGACTTACATCCTCATTATTATTCTGCCTAGCAAACTCAAATTATGAACGCACCCATAGTCGCATCATAATTCTCTCCCAAGGACTTCAAACTCTACTCCCACTAATAGCTTTTTGATGACTCCTAGCAAGCCTCGCTAACCT
+>Gorilla
+AAGCTTCACCGGCGCAGTTGTTCTCATAATCGCCCACGGACTTACATCCTCATTATTATTCTGCCTAGCAAACTCAAATTATGAACGCACCCATAGTCGCATCATAATTCTCTCCCAAGGACTTCAAACTCTACTCCCACTAATAGCTTTTGATGACTACTAGCAAGCCTCGCTAACCTC
+>Orangutan
+AAGCTTCACCGGCGCAACCACCCTCATGATTGCCCATGGACTCACATCCTCCCTACTGTTCTGCCTAGCAAACTCAAACTACGAACGAACCCATAGCCGCATCATAACTCTCTCCCAAGGACTTCAAACTCTACTCCCACTAATAGCTCTTTGATGATTTCTAGCAAGCCTCACTAACCT
+>Gibbon
+AAGCTTTACAGGTGCAACCGTCCTCATAATCGCCCACGGACTAACCTCTTCATTGCTATTCTGCCTAGCAAACTCAAACTACGAACGAACTCATAGCCGCATCATAATCCTCTCGCAAGGACTTCAAACTCTACTTCCACTAATAGCTTTCTGATGTTTCTAGCAAGCCTCAATAACCTC</textarea>
+      <div class="controls">
+        <label>Model:</label>
+        <select id="nj-model">
+          <option value="jc69">JC69 (Jukes-Cantor)</option>
+          <option value="k2p">K2P (Kimura 2-Parameter)</option>
+        </select>
+        <button class="btn btn-primary" id="nj-run">Run Analysis</button>
+      </div>
+      <div id="nj-results"></div>
+    </div>
+    <div class="insight-box">
+      <strong>Cross-disciplinary connection: Belief Propagation.</strong>
+      Felsenstein's pruning algorithm (1973) for computing tree likelihoods was independently discovered as the "belief propagation" or "sum-product" algorithm in electrical engineering and AI. The same message-passing principle powers error-correcting codes, Bayesian networks, and modern neural network inference.
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- TAB 2: Likelihood -->
+  <!-- ================================================================ -->
+  <div id="tab-likelihood" class="tab-panel">
+    <div class="card">
+      <h2>Maximum Likelihood Evaluation</h2>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:0.8rem;">
+        Evaluate the log-likelihood of a tree topology given sequence data under a substitution model. Branch lengths are optimized.
+      </p>
+      <label class="result-label">FASTA Input</label>
+      <textarea id="lk-fasta" rows="7">>A
+ACGTACGTACGTACGTACGT
+>B
+ACGTACGAACGTACGTACGT
+>C
+ACGTACGAACGTACGAACGT
+>D
+ACGAACGAACGAACGAACGA</textarea>
+      <label class="result-label" style="margin-top:0.6rem;">Newick Tree</label>
+      <textarea id="lk-newick" rows="2">((A:0.1,B:0.1):0.05,(C:0.1,D:0.15):0.05);</textarea>
+      <div class="controls">
+        <label>Model:</label>
+        <select id="lk-model">
+          <option value="jc69">JC69 (Jukes-Cantor)</option>
+          <option value="f84">F84 (Felsenstein 1984)</option>
+        </select>
+        <button class="btn btn-primary" id="lk-run">Evaluate Likelihood</button>
+      </div>
+      <div id="lk-results"></div>
+    </div>
+    <div class="insight-box">
+      <strong>Cross-disciplinary connection: Circuit Theory.</strong>
+      Felsenstein's independent contrasts method (1985) for analyzing continuous traits on a phylogeny is mathematically equivalent to computing effective resistance in an electrical circuit. The tree topology becomes a resistor network where branch lengths are resistances, and the "contrasts" at internal nodes are voltage differences.
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- TAB 3: Parsimony -->
+  <!-- ================================================================ -->
+  <div id="tab-parsimony" class="tab-panel">
+    <div class="card">
+      <h2>Maximum Parsimony Search</h2>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:0.8rem;">
+        Find the tree requiring the fewest evolutionary changes using Wagner parsimony with stepwise addition and SPR rearrangements.
+      </p>
+      <label class="result-label">FASTA Input</label>
+      <textarea id="mp-fasta" rows="7">>A
+ACGTACGTACGTACGTACGT
+>B
+ACGTACGAACGTACGTACGT
+>C
+ACGTACGAACGTACGAACGT
+>D
+ACGAACGAACGAACGAACGA
+>E
+ACGAACGAACGAACGTACGA</textarea>
+      <div class="controls">
+        <label>Seed:</label>
+        <input type="number" id="mp-seed" value="42" min="1" max="999999" style="width:80px;">
+        <button class="btn btn-primary" id="mp-run">Search</button>
+      </div>
+      <div id="mp-results"></div>
+    </div>
+    <div class="insight-box">
+      <strong>Cross-disciplinary connection: Coding Theory.</strong>
+      The genetic code's assignment of codons to amino acids is not random &mdash; it minimizes the impact of point mutations on protein function. Applying phylogenetic step-matrix analysis to the codon table reveals a z-score of &minus;2.82 against random codes, connecting parsimony to information theory and error-correcting codes in telecommunications.
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- TAB 4: Felsenstein Zone -->
+  <!-- ================================================================ -->
+  <div id="tab-felsen" class="tab-panel">
+    <div class="card">
+      <h2>The Felsenstein Zone: Long Branch Attraction</h2>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:0.8rem;">
+        Simulate DNA evolution on a 4-taxon tree and compare parsimony vs. maximum likelihood. When two unrelated lineages evolve rapidly, parsimony is "positively misleading" &mdash; more data makes it more confident in the wrong answer (Felsenstein, 1978).
+      </p>
+      <p style="font-size:0.82rem;color:var(--muted);margin-bottom:0.5rem;">
+        True tree: ((A:<em>long</em>, B:<em>short</em>):<em>internal</em>, (C:<em>short</em>, D:<em>long</em>))
+      </p>
+      <div class="slider-group">
+        <label>Long branch length: <span id="fz-long-val">0.80</span></label>
+        <input type="range" id="fz-long" min="0.1" max="2.0" step="0.05" value="0.80">
+      </div>
+      <div class="slider-group">
+        <label>Short branch length: <span id="fz-short-val">0.01</span></label>
+        <input type="range" id="fz-short" min="0.001" max="0.3" step="0.005" value="0.01">
+      </div>
+      <div class="slider-group">
+        <label>Internal branch length: <span id="fz-int-val">0.01</span></label>
+        <input type="range" id="fz-int" min="0.001" max="0.3" step="0.005" value="0.01">
+      </div>
+      <div class="controls">
+        <label>Sites:</label>
+        <input type="number" id="fz-sites" value="500" min="100" max="10000" step="100" style="width:80px;">
+        <label>Replicates:</label>
+        <input type="number" id="fz-reps" value="20" min="5" max="100" style="width:60px;">
+        <label>Seed:</label>
+        <input type="number" id="fz-seed" value="42" min="1" max="999999" style="width:80px;">
+        <button class="btn btn-primary" id="fz-run">Simulate</button>
+      </div>
+      <div id="fz-results"></div>
+    </div>
+    <div class="insight-box">
+      <strong>Cross-disciplinary connection: Simpson's Paradox.</strong>
+      Long-branch attraction in phylogenetics is structurally analogous to Simpson's paradox in statistics: a trend that appears in aggregated data reverses when the data is properly stratified. In both cases, ignoring a confounding variable (rate variation / subgroup membership) leads to the wrong conclusion, and an explicit model is needed to avoid the trap.
+    </div>
+  </div>
+
+  <!-- ================================================================ -->
+  <!-- TAB 5: Bootstrap -->
+  <!-- ================================================================ -->
+  <div id="tab-bootstrap" class="tab-panel">
+    <div class="card">
+      <h2>Bootstrap Confidence &amp; Consensus</h2>
+      <p style="font-size:0.85rem;color:var(--muted);margin-bottom:0.8rem;">
+        Resample alignment columns with replacement, build NJ trees for each replicate, and construct a majority-rule consensus tree showing branch support values.
+      </p>
+      <label class="result-label">FASTA Input</label>
+      <textarea id="bs-fasta" rows="10">>Human
+AAGCTTCACCGGCGCAGTCATTCTCATAATCGCCCACGGACTTACATCCTCATTACTATTCTGCCTAGCAAACTCAAACTACGAACGCACTCATAGTCGCATCATAATCCTCTCTCAAGGACTTCAAACTCTACTCCCACTAATAGCTTTTTGATGACTTCTAGCAAGCCTCGCTAACCT
+>Chimp
+AAGCTTCACCGGCGCAATTATCCTCATAATCGCCCACGGACTTACATCCTCATTATTATTCTGCCTAGCAAACTCAAATTATGAACGCACCCATAGTCGCATCATAATTCTCTCCCAAGGACTTCAAACTCTACTCCCACTAATAGCTTTTTGATGACTCCTAGCAAGCCTCGCTAACCT
+>Gorilla
+AAGCTTCACCGGCGCAGTTGTTCTCATAATCGCCCACGGACTTACATCCTCATTATTATTCTGCCTAGCAAACTCAAATTATGAACGCACCCATAGTCGCATCATAATTCTCTCCCAAGGACTTCAAACTCTACTCCCACTAATAGCTTTTGATGACTACTAGCAAGCCTCGCTAACCTC
+>Orangutan
+AAGCTTCACCGGCGCAACCACCCTCATGATTGCCCATGGACTCACATCCTCCCTACTGTTCTGCCTAGCAAACTCAAACTACGAACGAACCCATAGCCGCATCATAACTCTCTCCCAAGGACTTCAAACTCTACTCCCACTAATAGCTCTTTGATGATTTCTAGCAAGCCTCACTAACCT
+>Gibbon
+AAGCTTTACAGGTGCAACCGTCCTCATAATCGCCCACGGACTAACCTCTTCATTGCTATTCTGCCTAGCAAACTCAAACTACGAACGAACTCATAGCCGCATCATAATCCTCTCGCAAGGACTTCAAACTCTACTTCCACTAATAGCTTTCTGATGTTTCTAGCAAGCCTCAATAACCTC</textarea>
+      <div class="controls">
+        <label>Replicates:</label>
+        <input type="number" id="bs-reps" value="100" min="10" max="1000" step="10" style="width:80px;">
+        <label>Seed:</label>
+        <input type="number" id="bs-seed" value="42" min="1" max="999999" style="width:80px;">
+        <button class="btn btn-primary" id="bs-run">Run Bootstrap</button>
+      </div>
+      <div id="bs-results"></div>
+    </div>
+    <div class="insight-box">
+      <strong>Cross-disciplinary connection: Efron's Bootstrap.</strong>
+      Felsenstein (1985) was among the first to apply Bradley Efron's bootstrap (1979) to phylogenetics. The idea of resampling observed data to estimate uncertainty was revolutionary in statistics and has since been adopted across virtually every empirical science &mdash; from medicine to machine learning.
+    </div>
+  </div>
+</main>
+
+<footer>
+  <p>Powered by <a href="https://github.com/shandley/phylip-archaeology">phylip-rs</a> &mdash; a modern Rust reimplementation of PHYLIP algorithms, compiled to WebAssembly.</p>
+  <p style="margin-top:0.3rem;">All computation runs locally in your browser. No data is sent to any server.</p>
+</footer>
+
+<script type="module">
+import init, {
+  compute_nj,
+  compute_likelihood,
+  compute_parsimony,
+  felsenstein_zone,
+  bootstrap_nj
+} from './wasm/phylip_wasm.js';
+
+// =====================================================================
+// Initialize WASM
+// =====================================================================
+let wasmReady = false;
+init().then(() => {
+  wasmReady = true;
+  document.querySelectorAll('.btn-primary').forEach(b => b.disabled = false);
+}).catch(err => {
+  console.error('WASM init failed:', err);
+  document.querySelectorAll('.btn-primary').forEach(b => {
+    b.disabled = true;
+    b.textContent = 'WASM Failed';
+  });
+});
+
+// Disable buttons until WASM is ready
+document.querySelectorAll('.btn-primary').forEach(b => b.disabled = true);
+
+// =====================================================================
+// Tab switching
+// =====================================================================
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+  });
+});
+
+// =====================================================================
+// Newick-to-SVG tree renderer
+// =====================================================================
+function parseNewickForViz(s) {
+  s = s.trim().replace(/;$/, '');
+  let i = 0;
+  function parse() {
+    const node = { children: [], name: '', length: 0 };
+    if (s[i] === '(') {
+      i++; // skip (
+      node.children.push(parse());
+      while (s[i] === ',') { i++; node.children.push(parse()); }
+      i++; // skip )
+    }
+    // Read name
+    let name = '';
+    while (i < s.length && s[i] !== ':' && s[i] !== ',' && s[i] !== ')' && s[i] !== ';') {
+      name += s[i++];
+    }
+    node.name = name.trim();
+    // Read branch length
+    if (i < s.length && s[i] === ':') {
+      i++;
+      let num = '';
+      while (i < s.length && /[\d.eE\-+]/.test(s[i])) { num += s[i++]; }
+      node.length = parseFloat(num) || 0;
+    }
+    return node;
+  }
+  try { return parse(); } catch { return null; }
+}
+
+function renderTree(newick, container, width = 500, height = null) {
+  const root = parseNewickForViz(newick);
+  if (!root) { container.innerHTML = '<p class="error-msg">Could not parse Newick for visualization.</p>'; return; }
+
+  // Count leaves
+  function countLeaves(n) { return n.children.length === 0 ? 1 : n.children.reduce((s, c) => s + countLeaves(c), 0); }
+  const nleaves = countLeaves(root);
+  if (!height) height = Math.max(120, nleaves * 28 + 40);
+  const margin = { top: 15, right: 100, bottom: 15, left: 15 };
+  const w = width - margin.left - margin.right;
+  const h = height - margin.top - margin.bottom;
+
+  // Get max depth for scaling
+  function maxDepth(n, d) { return n.children.length === 0 ? d : Math.max(...n.children.map(c => maxDepth(c, d + (c.length || 0.01)))); }
+  const md = maxDepth(root, 0) || 1;
+  const xScale = w / md;
+
+  // Layout: assign y positions to leaves, then internal nodes
+  let leafIdx = 0;
+  function layout(n, x) {
+    n.x = x;
+    if (n.children.length === 0) {
+      n.y = (leafIdx++ / (nleaves - 1 || 1)) * h;
+    } else {
+      n.children.forEach(c => layout(c, x + (c.length || 0.01) * xScale));
+      n.y = n.children.reduce((s, c) => s + c.y, 0) / n.children.length;
+    }
+  }
+  layout(root, 0);
+
+  // Build SVG
+  let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">`;
+  svg += `<g transform="translate(${margin.left},${margin.top})">`;
+
+  function drawNode(n) {
+    // Draw horizontal line from parent junction to this node
+    // Draw vertical line connecting children
+    if (n.children.length > 0) {
+      const minY = Math.min(...n.children.map(c => c.y));
+      const maxY = Math.max(...n.children.map(c => c.y));
+      svg += `<line x1="${n.x}" y1="${minY}" x2="${n.x}" y2="${maxY}" />`;
+      n.children.forEach(c => {
+        svg += `<line x1="${n.x}" y1="${c.y}" x2="${c.x}" y2="${c.y}" />`;
+        drawNode(c);
+      });
+    }
+    // Leaf label
+    if (n.children.length === 0 && n.name) {
+      svg += `<text x="${n.x + 5}" y="${n.y + 4}">${n.name}</text>`;
+    }
+  }
+  drawNode(root);
+  svg += '</g></svg>';
+  container.innerHTML = svg;
+}
+
+// =====================================================================
+// Helper: format distance matrix as HTML table
+// =====================================================================
+function matrixHTML(names, matrix) {
+  let html = '<table class="matrix-table"><tr><th></th>';
+  names.forEach(n => html += `<th>${n}</th>`);
+  html += '</tr>';
+  matrix.forEach((row, i) => {
+    html += `<tr><td class="name">${names[i]}</td>`;
+    row.forEach((val, j) => {
+      html += `<td>${i === j ? '&mdash;' : val.toFixed(4)}</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</table>';
+  return html;
+}
+
+// =====================================================================
+// 1. Distance & NJ
+// =====================================================================
+document.getElementById('nj-run').addEventListener('click', () => {
+  if (!wasmReady) return;
+  const fasta = document.getElementById('nj-fasta').value;
+  const model = document.getElementById('nj-model').value;
+  const out = document.getElementById('nj-results');
+  out.innerHTML = '<p class="loading">Computing...</p>';
+
+  try {
+    const result = JSON.parse(compute_nj(fasta, model));
+    let html = `<h3>Distance Matrix (${result.model.toUpperCase()}, ${result.ntaxa} taxa, ${result.nsites} sites)</h3>`;
+    html += matrixHTML(result.names, result.matrix);
+    html += `<h3 style="margin-top:1rem;">Neighbor-Joining Tree</h3>`;
+    html += `<div class="result-label">Newick</div>`;
+    html += `<div class="result-box">${result.newick}</div>`;
+    html += `<div class="tree-container" id="nj-tree"></div>`;
+    out.innerHTML = html;
+    renderTree(result.newick, document.getElementById('nj-tree'));
+  } catch (e) {
+    out.innerHTML = `<p class="error-msg">Error: ${e}</p>`;
+  }
+});
+
+// =====================================================================
+// 2. Likelihood
+// =====================================================================
+document.getElementById('lk-run').addEventListener('click', () => {
+  if (!wasmReady) return;
+  const fasta = document.getElementById('lk-fasta').value;
+  const newick = document.getElementById('lk-newick').value;
+  const model = document.getElementById('lk-model').value;
+  const out = document.getElementById('lk-results');
+  out.innerHTML = '<p class="loading">Computing...</p>';
+
+  try {
+    const result = JSON.parse(compute_likelihood(fasta, newick, model));
+    let html = `<h3>Results</h3>`;
+    html += `<div class="result-box">`;
+    html += `Log-likelihood:  ${result.lnl.toFixed(4)}\n`;
+    html += `Model:           ${result.model.toUpperCase()}\n`;
+    html += `Taxa:            ${result.ntaxa}\n`;
+    html += `Sites:           ${result.nsites}\n`;
+    html += `\nOptimized tree:\n${result.newick}`;
+    html += `</div>`;
+    html += `<div class="tree-container" id="lk-tree"></div>`;
+    out.innerHTML = html;
+    renderTree(result.newick, document.getElementById('lk-tree'));
+  } catch (e) {
+    out.innerHTML = `<p class="error-msg">Error: ${e}</p>`;
+  }
+});
+
+// =====================================================================
+// 3. Parsimony
+// =====================================================================
+document.getElementById('mp-run').addEventListener('click', () => {
+  if (!wasmReady) return;
+  const fasta = document.getElementById('mp-fasta').value;
+  const seed = parseInt(document.getElementById('mp-seed').value) || 42;
+  const out = document.getElementById('mp-results');
+  out.innerHTML = '<p class="loading">Searching...</p>';
+
+  try {
+    const result = JSON.parse(compute_parsimony(fasta, seed));
+    let html = `<h3>Results</h3>`;
+    html += `<div class="result-box">`;
+    html += `Parsimony score: ${result.score} steps\n`;
+    html += `Taxa:            ${result.ntaxa}\n`;
+    html += `Sites:           ${result.nsites}\n`;
+    html += `\nMost parsimonious tree:\n${result.newick}`;
+    html += `</div>`;
+    html += `<div class="tree-container" id="mp-tree"></div>`;
+    out.innerHTML = html;
+    renderTree(result.newick, document.getElementById('mp-tree'));
+  } catch (e) {
+    out.innerHTML = `<p class="error-msg">Error: ${e}</p>`;
+  }
+});
+
+// =====================================================================
+// 4. Felsenstein Zone
+// =====================================================================
+// Slider labels
+['long', 'short', 'int'].forEach(id => {
+  const slider = document.getElementById('fz-' + id);
+  const label = document.getElementById('fz-' + id + '-val');
+  slider.addEventListener('input', () => { label.textContent = parseFloat(slider.value).toFixed(id === 'long' ? 2 : 3); });
+});
+
+document.getElementById('fz-run').addEventListener('click', () => {
+  if (!wasmReady) return;
+  const long_b = parseFloat(document.getElementById('fz-long').value);
+  const short_b = parseFloat(document.getElementById('fz-short').value);
+  const int_b = parseFloat(document.getElementById('fz-int').value);
+  const nsites = parseInt(document.getElementById('fz-sites').value) || 500;
+  const nreps = parseInt(document.getElementById('fz-reps').value) || 20;
+  const seed = parseInt(document.getElementById('fz-seed').value) || 42;
+  const out = document.getElementById('fz-results');
+  out.innerHTML = '<p class="loading">Simulating (this may take a moment)...</p>';
+
+  // Use setTimeout to let the UI update before blocking
+  setTimeout(() => {
+    try {
+      const result = JSON.parse(felsenstein_zone(long_b, short_b, int_b, nsites, nreps, seed));
+      const s = result.summary;
+      const lba_pct = s.parsimony_lba_pct;
+
+      let html = '<h3>Results</h3>';
+      html += '<div class="bar-legend"><span class="pars-leg">Parsimony</span><span class="ml-leg">Max. Likelihood</span></div>';
+      html += '<div class="bar-chart">';
+
+      // "Correct (T1)" bars
+      const pHt = Math.max(2, s.parsimony_correct_pct * 1.8);
+      const mHt = Math.max(2, s.ml_correct_pct * 1.8);
+      html += '<div class="bar-group">';
+      html += '<div class="bar-pair">';
+      html += `<div class="bar pars" style="height:${pHt}px">${s.parsimony_correct_pct.toFixed(0)}%</div>`;
+      html += `<div class="bar ml" style="height:${mHt}px">${s.ml_correct_pct.toFixed(0)}%</div>`;
+      html += '</div>';
+      html += '<div class="bar-label">Correct tree (T1)</div></div>';
+
+      // "LBA (T3)" bar for parsimony
+      const lHt = Math.max(2, lba_pct * 1.8);
+      const lba_ml = 100 - s.ml_correct_pct;
+      const lmHt = Math.max(2, lba_ml * 1.8);
+      html += '<div class="bar-group">';
+      html += '<div class="bar-pair">';
+      html += `<div class="bar pars" style="height:${lHt}px">${lba_pct.toFixed(0)}%</div>`;
+      html += `<div class="bar ml" style="height:${lmHt}px">${lba_ml.toFixed(0)}%</div>`;
+      html += '</div>';
+      html += '<div class="bar-label">Wrong tree</div></div>';
+
+      html += '</div>'; // bar-chart
+
+      html += `<div class="result-box">`;
+      html += `Parsimony correct:    ${s.parsimony_correct_pct.toFixed(1)}%\n`;
+      html += `ML correct:           ${s.ml_correct_pct.toFixed(1)}%\n`;
+      html += `Parsimony picks LBA:  ${lba_pct.toFixed(1)}%\n`;
+      html += `\nParameters: long=${long_b.toFixed(2)}, short=${short_b.toFixed(3)}, internal=${int_b.toFixed(3)}`;
+      html += `\nSites: ${nsites}, Replicates: ${nreps}`;
+      html += `</div>`;
+
+      if (s.parsimony_correct_pct < s.ml_correct_pct) {
+        html += `<p style="margin-top:0.6rem;font-size:0.85rem;color:var(--vermillion);font-weight:500;">`;
+        html += `Parsimony is being misled by long-branch attraction! ML correctly recovers the true tree more often.`;
+        html += `</p>`;
+      }
+
+      out.innerHTML = html;
+    } catch (e) {
+      out.innerHTML = `<p class="error-msg">Error: ${e}</p>`;
+    }
+  }, 50);
+});
+
+// =====================================================================
+// 5. Bootstrap
+// =====================================================================
+document.getElementById('bs-run').addEventListener('click', () => {
+  if (!wasmReady) return;
+  const fasta = document.getElementById('bs-fasta').value;
+  const nreps = parseInt(document.getElementById('bs-reps').value) || 100;
+  const seed = parseInt(document.getElementById('bs-seed').value) || 42;
+  const out = document.getElementById('bs-results');
+  out.innerHTML = '<p class="loading">Running bootstrap (this may take a moment)...</p>';
+
+  setTimeout(() => {
+    try {
+      const result = JSON.parse(bootstrap_nj(fasta, nreps, seed));
+
+      let html = '<h3>Original NJ Tree</h3>';
+      html += `<div class="result-box">${result.original_newick}</div>`;
+      html += `<div class="tree-container" id="bs-orig-tree"></div>`;
+
+      html += '<h3>Majority-Rule Consensus Tree</h3>';
+      html += `<div class="result-box">${result.consensus_newick}</div>`;
+      html += `<div class="tree-container" id="bs-cons-tree"></div>`;
+
+      if (result.split_support && result.split_support.length > 0) {
+        html += '<h3>Split Support</h3>';
+        html += '<table class="support-table"><tr><th>Clade</th><th>Count</th><th>Frequency</th></tr>';
+        result.split_support.forEach(sp => {
+          const freq_pct = (sp.frequency * 100).toFixed(1);
+          html += `<tr><td>{${sp.taxa.join(', ')}}</td><td>${sp.count}/${result.nreps}</td><td>${freq_pct}%</td></tr>`;
+        });
+        html += '</table>';
+      }
+
+      html += `<div class="result-box" style="margin-top:0.8rem;">`;
+      html += `Bootstrap replicates: ${result.nreps}\n`;
+      html += `Taxa: ${result.ntaxa}\n`;
+      html += `Sites: ${result.nsites}`;
+      html += `</div>`;
+
+      out.innerHTML = html;
+      renderTree(result.original_newick, document.getElementById('bs-orig-tree'));
+      renderTree(result.consensus_newick, document.getElementById('bs-cons-tree'));
+    } catch (e) {
+      out.innerHTML = `<p class="error-msg">Error: ${e}</p>`;
+    }
+  }, 50);
+});
+
+</script>
+</body>
+</html>

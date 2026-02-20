@@ -1,0 +1,16 @@
+{
+  "name": "phylip-wasm",
+  "type": "module",
+  "description": "WebAssembly wrapper for phylip-rs phylogenetic algorithms",
+  "version": "0.1.0",
+  "files": [
+    "phylip_wasm_bg.wasm",
+    "phylip_wasm.js",
+    "phylip_wasm.d.ts"
+  ],
+  "main": "phylip_wasm.js",
+  "types": "phylip_wasm.d.ts",
+  "sideEffects": [
+    "./snippets/*"
+  ]
+}
