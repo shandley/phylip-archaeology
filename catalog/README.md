@@ -2,7 +2,7 @@
 
 This directory contains the structured preservation of Joe Felsenstein's
 [phylogenetics software catalog](https://phylipweb.github.io/phylip/software.html),
-which documents **392 phylogeny packages** and **54 free web servers**.
+which documents **407 phylogenetics tools** (phylogeny packages and free web servers).
 
 ## Contents
 
@@ -12,6 +12,11 @@ which documents **392 phylogeny packages** and **54 free web servers**.
 - `parse_catalog.py` — Extracts tool names, categories, platforms from index page
 - `enrich_catalog.py` — Extracts URLs and descriptions from detail pages, checks liveness
 - `fix_matches.py` — Resolves anchor-to-name mismatches for additional coverage
+- `analysis/` — Metadata extraction, statistics, and figure generation
+  - `tools_enriched.json` — Enriched catalog with release years, authors, languages
+  - `supplementary_table1.csv` — Publication-ready supplementary table (407 rows)
+  - `stats/narrative_stats.json` — Pre-computed summary statistics
+  - `figures/` — Publication figures (Figure 3 in manuscript)
 
 ## Methodology
 

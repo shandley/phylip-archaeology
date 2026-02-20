@@ -240,15 +240,15 @@ def main():
     FIG_DIR.mkdir(parents=True, exist_ok=True)
 
     # Save in multiple formats
-    fig.savefig(FIG_DIR / "figure4_combined.pdf", bbox_inches="tight",
+    fig.savefig(FIG_DIR / "figure3_combined.pdf", bbox_inches="tight",
                 pad_inches=0.1)
-    fig.savefig(FIG_DIR / "figure4_combined.png", bbox_inches="tight",
+    fig.savefig(FIG_DIR / "figure3_combined.png", bbox_inches="tight",
                 pad_inches=0.1, dpi=300)
     plt.close()
 
-    print(f"Figure 4 saved:")
-    print(f"  {FIG_DIR / 'figure4_combined.pdf'}")
-    print(f"  {FIG_DIR / 'figure4_combined.png'}")
+    print(f"Figure 3 saved:")
+    print(f"  {FIG_DIR / 'figure3_combined.pdf'}")
+    print(f"  {FIG_DIR / 'figure3_combined.png'}")
 
     # Also generate full-width version
     fig2, axes2 = plt.subplots(1, 3, figsize=(180 / 25.4, 55 / 25.4),
@@ -262,14 +262,14 @@ def main():
         ax.text(-0.12, 1.12, label, transform=ax.transAxes,
                 fontsize=10, fontweight="bold", va="top")
 
-    fig2.savefig(FIG_DIR / "figure4_wide.pdf", bbox_inches="tight",
+    fig2.savefig(FIG_DIR / "figure3_wide.pdf", bbox_inches="tight",
                  pad_inches=0.1)
-    fig2.savefig(FIG_DIR / "figure4_wide.png", bbox_inches="tight",
+    fig2.savefig(FIG_DIR / "figure3_wide.png", bbox_inches="tight",
                  pad_inches=0.1, dpi=300)
     plt.close()
 
-    print(f"  {FIG_DIR / 'figure4_wide.pdf'}")
-    print(f"  {FIG_DIR / 'figure4_wide.png'}")
+    print(f"  {FIG_DIR / 'figure3_wide.pdf'}")
+    print(f"  {FIG_DIR / 'figure3_wide.png'}")
 
 
 if __name__ == "__main__":

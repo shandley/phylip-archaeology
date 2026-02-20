@@ -39,9 +39,9 @@ The 20 cross-disciplinary connections identified in PHYLIP source code, with ful
 
 ## Supplementary Table 1: Software Catalog
 
-Complete listing of all 407 phylogenetics tools from Felsenstein's catalog with preservation status, release year (where known), programming language, methodological categories, and URL status.
+Complete listing of all 407 phylogenetics tools from Felsenstein's catalog with preservation status, release year (where known), programming language(s), methodological categories, original URL, Wayback Machine archive URL, and author.
 
-*Content: Tabulated from catalog/analysis/tools_enriched.json*
+*Provided as: catalog/analysis/supplementary_table1.csv (407 rows, 10 columns)*
 
 ---
 

@@ -189,8 +189,8 @@ def main():
                 fontsize=10, fontweight="bold", va="top")
 
     FIG_DIR.mkdir(parents=True, exist_ok=True)
-    fig.savefig(FIG_DIR / "figure5_combined.pdf", bbox_inches="tight", pad_inches=0.1)
-    fig.savefig(FIG_DIR / "figure5_combined.png", bbox_inches="tight",
+    fig.savefig(FIG_DIR / "figure4_combined.pdf", bbox_inches="tight", pad_inches=0.1)
+    fig.savefig(FIG_DIR / "figure4_combined.png", bbox_inches="tight",
                 pad_inches=0.1, dpi=300)
     plt.close()
 
@@ -205,8 +205,8 @@ def main():
         ax.text(-0.12, 1.12, label, transform=ax.transAxes,
                 fontsize=10, fontweight="bold", va="top")
 
-    fig2.savefig(FIG_DIR / "figure5_wide.pdf", bbox_inches="tight", pad_inches=0.1)
-    fig2.savefig(FIG_DIR / "figure5_wide.png", bbox_inches="tight",
+    fig2.savefig(FIG_DIR / "figure4_wide.pdf", bbox_inches="tight", pad_inches=0.1)
+    fig2.savefig(FIG_DIR / "figure4_wide.png", bbox_inches="tight",
                  pad_inches=0.1, dpi=300)
     plt.close()
 
