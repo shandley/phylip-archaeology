@@ -18,12 +18,13 @@ What emerged was something more than preservation. By reimplementing every algor
 | Source files | **58** |
 | Unit tests | **934** |
 | Doc tests | **25** |
-| Total tests | **959** |
+| Validation tests | **91** |
+| Total tests | **1,050** |
 | Compiler warnings | **0** |
 | External dependencies | **0** |
 | PHYLIP programs covered | **~30/36** |
 | CLI commands | **9** |
-| Interactive demonstrations | **2** |
+| Interactive demonstrations | **10** |
 | Substitution models | **4** (JC69, F84, Poisson, WAG) |
 
 The zero-dependency constraint was deliberate and consequential. Every mathematical function — the Lanczos approximation for the gamma function, continued fractions for the incomplete gamma integral, Halley's method for numerical inversion, Abramowitz & Stegun's rational approximation for the normal quantile — is implemented from scratch. The code is its own textbook. You can read `gamma.rs` and learn how the incomplete gamma function works, because there is nowhere else to hide.

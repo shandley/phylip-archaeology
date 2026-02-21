@@ -63,7 +63,8 @@ continued fractions -- is implemented from first principles using only `std`.
 | Source files | **58** |
 | Unit tests | **934** |
 | Doc tests | **25** |
-| Total tests | **959** |
+| Validation tests | **91** |
+| Total tests | **1,050** |
 | Compiler warnings | **0** |
 | External dependencies | **0** |
 | PHYLIP programs covered | **~30/36** |
@@ -305,7 +306,7 @@ phylip-archaeology/
 
 - **Fidelity first**: Preserve original algorithms exactly before modernizing
 - **Zero dependencies**: The code is its own textbook -- every function from first principles
-- **Validation**: 959 tests verify correctness against known analytical results
+- **Validation**: 1,050 tests verify correctness against known analytical results, including direct comparison against 27 PHYLIP 3.697 C programs
 - **Attribution**: Every algorithm traces back to its originator and key papers
 - **Accessibility**: Clear documentation for both historians and practitioners
 - **Respect**: This is archaeology, not criticism -- honor the constraints of the era
