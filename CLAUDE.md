@@ -47,8 +47,8 @@ phylip-archaeology/
 | Source files | 58 |
 | Unit tests | 934 |
 | Doc tests | 25 |
-| Validation tests | 74 |
-| Total tests | 1,033 |
+| Validation tests | 79 |
+| Total tests | 1,038 |
 | Compiler warnings | 0 |
 | External dependencies | 0 |
 | PHYLIP programs covered | ~30/36 |
@@ -86,7 +86,7 @@ phylip-rs/src/
 ```bash
 cd phylip-rs
 cargo build                    # Build library and CLI
-cargo test                     # Run all 1,033 tests
+cargo test                     # Run all 1,038 tests
 cargo build --examples         # Build interactive demonstrations
 cargo run --release -- --help  # CLI usage
 ```

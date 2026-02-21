@@ -1,6 +1,6 @@
 # Validation Report: phylip-rs vs PHYLIP 3.697
 
-**Last updated**: 2026-02-20
+**Last updated**: 2026-02-21
 **phylip-rs version**: 0.1.0
 **PHYLIP version**: 3.697 (compiled from source via Makefile.unx)
 
@@ -14,12 +14,12 @@ phylip-rs is validated through four complementary strategies:
 |----------|-------|-------------|
 | Analytical | 32 | Mathematical formulas verified against hand-calculated values |
 | Classic datasets | 15 | Published results from foundational phylogenetics papers reproduced |
-| PHYLIP C comparison | 16 | Direct comparison against PHYLIP 3.697 on identical inputs |
+| PHYLIP C comparison | 21 | Direct comparison against PHYLIP 3.697 on identical inputs |
 | Medium-scale integration | 11 | Statistical properties verified on 8-100 taxon simulated datasets |
-| **Total validation** | **74** | |
+| **Total validation** | **79** | |
 | Library unit tests | 934 | |
 | Doc tests | 25 | |
-| **Grand total** | **1,033** | All pass, zero warnings |
+| **Grand total** | **1,038** | All pass, zero warnings |
 
 ## Running the Tests
 
@@ -57,10 +57,13 @@ Each phylip-rs module is mapped to its validation evidence:
 | bootstrap | Bootstrap resampling | Weights sum, zeros ~36.8% | Felsenstein 1985 | seqboot+NJ+consense pipeline | 20-taxon convergence |
 | consensus | Consensus trees | Strict, majority-rule | — | consensus pipeline | — |
 | tree::newick | Newick I/O | Round-trip topology | — | — | 50-taxon round-trip |
-| tree::distances | Robinson-Foulds | Identical=0, different>0 | — | — | — |
+| tree::distances | Robinson-Foulds | Identical=0, different>0 | — | treedist (RF=2 exact) | — |
 | likelihood::models | Substitution models | JC69 P(t), F84 P(t) row sums | — | — | Model comparison |
-| invariants | Lake/Cavender invariants | — | Lake 1987, Cavender 1978 | — | — |
+| invariants | Lake/Cavender invariants | — | Lake 1987, Cavender 1978 | dnainvar (pattern counts, Cavender values) | — |
 | comparative::contrasts | Independent contrasts | — | Felsenstein 1985 | — | — |
+| parsimony::branch_and_bound | Branch-and-bound | — | — | dnapenny (score=13 exact) | — |
+| parsimony::protein_parsimony | Protein parsimony | — | — | protpars (score=7 exact) | — |
+| compatibility::dna_compat | DNA compatibility | — | — | dnacomp (12/13 compatible sites) | — |
 
 ---
 
@@ -172,6 +175,75 @@ Epsilon   GGAAAGCCACACC
 **Method**: 100 bootstrap replicates → NJ tree inference → majority-rule consensus
 
 **Result**: Pipeline produces valid consensus tree with expected properties. Direct seqboot comparison not performed (different RNG implementations).
+
+### Test 14: Protein Parsimony (protpars)
+
+**Input**: 5 taxa, 10 amino acid sites
+```
+   5   10
+Alpha     MKTHILLKFR
+Beta      MKTHILLKFS
+Gamma     MRTVILLKFR
+Delta     MKTAILLKFS
+Epsilon   MKTHILLRFR
+```
+
+**PHYLIP command**: `echo "Y" | protpars`
+
+**PHYLIP reference**: Parsimony score = 7, 6 equally parsimonious trees
+
+**Result**: Parsimony score matches exactly (7 steps). Tree has correct number of leaves (5).
+
+### Test 15: DNA Invariants (dnainvar)
+
+**Input**: 4 taxa, 13 sites (required for invariants analysis)
+```
+   4   13
+Alpha     AACGTGGCCACAT
+Beta      AAGGTCGCCACAC
+Gamma     CAGTTCGCCACAA
+Delta     GAGATTTCCGCCT
+```
+
+**PHYLIP command**: `echo "Y" | dnainvar`
+
+**PHYLIP reference**: Lake's invariants all zero (uninformative on 13 sites); Cavender's type K: I=-12, II=0, III=12
+
+**Result**: Lake's invariants confirm low/zero informative patterns on this small dataset, matching PHYLIP. Cavender's invariants computed; the topology with the smallest absolute invariant value identifies the preferred tree, consistent with PHYLIP's output.
+
+### Test 16: Branch-and-Bound Exact Parsimony (dnapenny)
+
+**Input**: 5 taxa, 13 sites (same as dnapars test)
+
+**PHYLIP command**: `echo "Y" | dnapenny`
+
+**PHYLIP reference**: Parsimony score = 13, 3 most parsimonious trees
+
+**Result**: Score matches exactly (13 steps). Branch-and-bound guarantees the globally optimal solution, so this score must match dnapars exactly. Both PHYLIP dnapenny and phylip-rs find the same optimal parsimony score.
+
+### Test 17: DNA Compatibility (dnacomp)
+
+**Input**: 5 taxa, 13 sites (same as dnapars test)
+
+**PHYLIP command**: `echo "Y" | dnacomp`
+
+**PHYLIP reference**: 12 compatible sites out of 13
+
+**Result**: phylip-rs finds 11-13 compatible sites (within ±1 of PHYLIP's 12), depending on the search heuristic's starting tree. The total site count matches exactly (13).
+
+### Test 18: Robinson-Foulds Tree Distance (treedist)
+
+**Input**: Two 5-taxon Newick trees differing by one NNI move
+```
+Tree 1: ((Alpha,Beta),(Gamma,(Delta,Epsilon)));
+Tree 2: ((Alpha,Beta),(Delta,(Gamma,Epsilon)));
+```
+
+**PHYLIP command**: `echo "D\nY" | treedist` (D toggles to symmetric difference mode; reads from `intree`)
+
+**PHYLIP reference**: Symmetric difference = 2
+
+**Result**: Robinson-Foulds distance matches exactly (RF = 2). Additionally verified: identical trees yield RF = 0.
 
 ---
 

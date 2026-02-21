@@ -13,7 +13,7 @@ and reproduction instructions, see **[VALIDATION_REPORT.md](VALIDATION_REPORT.md
 cd validation
 bash setup.sh
 
-# 2. Run PHYLIP comparison tests (16 tests)
+# 2. Run PHYLIP comparison tests (21 tests)
 PHYLIP_EXE_DIR=validation/phylip-3.697/exe cargo test -p phylip-rs --test validation_phylip -- --ignored
 
 # 3. Run all other validation tests (58 tests, no external dependencies)
@@ -31,7 +31,12 @@ cargo test -p phylip-rs --test validation_analytical --test validation_classics 
 | fitch | distance::fitch_margoliash | WLS score + topology |
 | kitsch | distance::kitsch | WLS score + ultrametric property |
 | dnapars | parsimony::wagner | Score (exact) + topology |
+| dnapenny | parsimony::branch_and_bound | Score (exact, guaranteed optimal) |
 | dnaml | likelihood::pruning | Log-likelihood (same range) |
 | dnamlk | likelihood::clock | Clock lnL + ultrametric property |
+| dnacomp | compatibility::dna_compat | Compatible sites (±1) |
+| dnainvar | invariants | Lake's + Cavender's invariant values |
 | protdist | models::protein_distances | Protein distances (tol: 0.05) |
+| protpars | parsimony::protein_parsimony | Score (exact) |
 | seqboot+consense | bootstrap+consensus | Pipeline validation |
+| treedist | tree::distances | Robinson-Foulds distance (exact) |
