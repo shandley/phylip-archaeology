@@ -298,7 +298,6 @@ phylip-archaeology/
 ├── docs/                  # Interactive WASM demo (GitHub Pages)
 ├── phylip-wasm/           # WebAssembly bindings for browser demo
 ├── phylip-source/         # PHYLIP C source code archive and analysis
-├── algorithms/            # Extracted algorithm documentation
 └── timeline/              # Historical data and visualizations
 ```
 

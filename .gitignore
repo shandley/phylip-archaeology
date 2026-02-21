@@ -32,6 +32,9 @@ Thumbs.db
 # Environment
 .env
 
+# Python lock files
+uv.lock
+
 # PHYLIP website clone (large, obtain separately)
 phylip-source/src/
 

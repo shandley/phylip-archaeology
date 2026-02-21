@@ -13,15 +13,15 @@ phylip-archaeology/
 ├── INSIGHTS.md            # Deep analysis of 20 algorithmic case studies
 ├── TRIBUTE.md             # Historical narrative of Felsenstein's contributions
 ├── REFLECTION.md          # What we built and what we learned
-├── PAPER_PLAN.md           # Nature Methods paper planning document
 ├── Cargo.toml             # Workspace root
 ├── phylip-rs/             # Modern Rust reimplementation
 │   ├── Cargo.toml
-│   ├── src/               # Library and CLI source (57 files)
+│   ├── src/               # Library and CLI source (58 files)
 │   └── examples/          # 10 interactive demonstrations
 ├── manuscript/            # Nature Methods Article draft
-│   ├── manuscript.md      # Full manuscript (~3,000 words + Methods)
-│   └── supplementary.md   # Supplementary material outline
+│   ├── manuscript.md      # Full manuscript (~6,000 words)
+│   ├── supplementary.md   # Supplementary materials
+│   └── figures/           # Figures 1-2 with generation scripts
 ├── benchmarks/            # Performance benchmarking pipeline
 │   ├── generate_data.py   # JC69 dataset simulator
 │   ├── run_benchmarks.py  # Multi-tool benchmark runner
@@ -35,7 +35,6 @@ phylip-archaeology/
 │   ├── README.md          # Quick start and test overview
 │   └── setup.sh           # Downloads and compiles PHYLIP 3.697
 ├── phylip-source/         # PHYLIP C source code archive and analysis
-├── algorithms/            # Extracted algorithm documentation
 └── timeline/              # Historical data and visualizations
 ```
 
@@ -51,7 +50,7 @@ phylip-archaeology/
 | Total tests | 1,050 |
 | Compiler warnings | 0 |
 | External dependencies | 0 |
-| PHYLIP programs covered | ~30/36 |
+| PHYLIP programs covered | 29/36 |
 | CLI commands | 9 |
 | Interactive demonstrations | 10 |
 | Algorithmic case studies | 20 |
@@ -110,16 +109,19 @@ drawgram, drawtree, dnamove, dolmove, move, retree, factor
 ## Project Status
 
 ### Completed
-- **Rust reimplementation** — 35,805 lines, 1,050 tests, ~30/36 PHYLIP programs, zero dependencies
+- **Rust reimplementation** — 35,805 lines, 1,050 tests, 29/36 PHYLIP programs, zero dependencies
 - **Validation suite** — 91 validation tests across 4 strategies (analytical, classic datasets, PHYLIP 3.697 comparison, medium-scale integration)
+- **PHYLIP 3.697 comparison** — 33 tests across 27 programs, zero bugs found in original C code
 - **20 algorithmic case studies** — Cross-disciplinary insights documented in INSIGHTS.md
 - **10 interactive demonstrations** — Compilable examples in phylip-rs/examples/
-- **Software catalog analysis** — 407 tools scraped, enriched, analyzed; Figure 4 generated
-- **Performance benchmarking** — 180 runs (36 datasets x 5 tools); Figure 5 generated
-- **Manuscript draft** — Nature Methods Article in manuscript/manuscript.md (~3,000 words + Methods)
+- **Software catalog analysis** — 407 tools scraped, enriched, analyzed
+- **Performance benchmarking** — 180 runs (36 datasets x 5 tools)
+- **Figures 1-2** — Workflow schematic and algorithmic discovery panels with generation scripts
+- **Manuscript** — Nature Methods Article (~6,000 words) with supplementary materials
+- **CI/CD** — GitHub Actions: test (ubuntu + macos), format check
+- **Release** — v0.1.0 tagged and published on GitHub
 
 ### Remaining
-- **Figures 1-2** — Workflow schematic and algorithmic discovery panels (require manual/programmatic creation)
-- **Manuscript revision** — Polish, expand to full word budget, finalize references
+- **Manuscript revision** — Final copy-editing, cover letter
 - **Community engagement** — Share with Joe Felsenstein, phylogenetics community
-- **Submission** — Final polish, cover letter, Nature Methods submission
+- **Submission** — Nature Methods submission
