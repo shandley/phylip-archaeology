@@ -13,7 +13,7 @@ and reproduction instructions, see **[VALIDATION_REPORT.md](VALIDATION_REPORT.md
 cd validation
 bash setup.sh
 
-# 2. Run PHYLIP comparison tests (21 tests)
+# 2. Run PHYLIP comparison tests (30 tests)
 PHYLIP_EXE_DIR=validation/phylip-3.697/exe cargo test -p phylip-rs --test validation_phylip -- --ignored
 
 # 3. Run all other validation tests (58 tests, no external dependencies)
@@ -38,5 +38,14 @@ cargo test -p phylip-rs --test validation_analytical --test validation_classics 
 | dnainvar | invariants | Lake's + Cavender's invariant values |
 | protdist | models::protein_distances | Protein distances (tol: 0.05) |
 | protpars | parsimony::protein_parsimony | Score (exact) |
+| clique | compatibility::clique | Clique size + tree |
+| dollop | parsimony::dollo | Dollo score (heuristic) |
+| mix | parsimony::wagner | Binary Wagner score (exact) |
+| penny | parsimony::branch_and_bound | Binary B&B score (exact) |
+| pars | parsimony::multistate | Multistate score (±1) |
+| gendist | models::gene_freq | Nei distances (tol: 0.01) |
+| restdist | models::restriction | Nei-Li distances (tol: 0.02) |
+| contml | comparative::contml | Brownian ML lnL |
+| contrast | comparative::contrasts | PIC correlations (tol: 0.15) |
 | seqboot+consense | bootstrap+consensus | Pipeline validation |
 | treedist | tree::distances | Robinson-Foulds distance (exact) |
