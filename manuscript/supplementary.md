@@ -69,7 +69,7 @@ Complete results for all 180 benchmark runs (36 datasets x 5 tools), including w
 | invariants/ | 2 | 830 | 18 | Lake's and Cavender's phylogenetic invariants |
 | consensus/ | 1 | 814 | 25 | Strict/majority-rule/extended consensus |
 | main.rs, lib.rs | 2 | 940 | 25 (doc) | CLI binary and library root |
-| **Total** | **58** | **35,805** | **959** | 934 unit + 25 doc tests |
+| **Total** | **58** | **35,805** | **1,033** | 934 unit + 25 doc + 74 validation tests |
 
 ---
 
@@ -129,3 +129,27 @@ phylip-rs ML best tree lnL: -3383.2615.
 The 13-unit gap reflects phylip-rs's tree search converging to a local optimum, not a scoring discrepancy.
 
 **Conclusion:** phylip-rs and IQ-TREE agree on log-likelihood values to four or more decimal places when evaluating the same topology under JC69. The lnL gaps reported in the benchmark results reflect differences in tree search strategies (NNI heuristics, starting trees), not in likelihood computation.
+
+---
+
+## Supplementary Note 5: Validation Report — phylip-rs vs PHYLIP 3.697
+
+A comprehensive validation report documenting the direct comparison between phylip-rs and PHYLIP 3.697 C executables is maintained as a living document in the repository at `validation/VALIDATION_REPORT.md`. The report includes:
+
+- **Validation matrix**: Every phylip-rs module mapped to its validation evidence across four strategies (analytical, published results, PHYLIP C comparison, medium-scale integration)
+- **PHYLIP C comparison details**: For each of 10 compared programs (dnadist, neighbor, dnapars, dnaml, dnamlk, fitch, kitsch, protdist, seqboot, consense), the report documents input data, PHYLIP stdin commands, expected and actual output values, tolerances, and pass/fail status
+- **Known differences**: Documented parameterization differences between implementations (K2P transition/transversion ratio estimation, ML tree search strategies, bootstrap RNG)
+- **Reproduction instructions**: Step-by-step instructions for downloading, compiling, and running PHYLIP 3.697, executing all comparison tests, and manually verifying individual results
+
+The 74 validation tests are organized into four test files:
+
+| Test File | Tests | Strategy |
+|-----------|-------|----------|
+| validation_analytical | 32 | Mathematical formulas verified against hand-calculated values |
+| validation_classics | 15 | Published results from foundational phylogenetics papers reproduced |
+| validation_phylip | 16 | Direct comparison against PHYLIP 3.697 C executables on identical inputs |
+| validation_medium | 11 | Statistical properties verified on 8-100 taxon simulated datasets |
+
+PHYLIP comparison tests use hardcoded reference values (enabling execution without PHYLIP binaries) with optional live comparison against PHYLIP executables. Tests requiring PHYLIP binaries are marked `#[ignore]` and activated via the `PHYLIP_EXE_DIR` environment variable.
+
+*Full report: validation/VALIDATION_REPORT.md*

@@ -1,0 +1,37 @@
+# Validation: phylip-rs vs PHYLIP C
+
+This directory contains infrastructure for validating phylip-rs against the
+original PHYLIP C implementation (v3.697) by Joe Felsenstein.
+
+For the full validation report with results, tolerances, known differences,
+and reproduction instructions, see **[VALIDATION_REPORT.md](VALIDATION_REPORT.md)**.
+
+## Quick Start
+
+```bash
+# 1. Download and compile PHYLIP 3.697
+cd validation
+bash setup.sh
+
+# 2. Run PHYLIP comparison tests (16 tests)
+PHYLIP_EXE_DIR=validation/phylip-3.697/exe cargo test -p phylip-rs --test validation_phylip -- --ignored
+
+# 3. Run all other validation tests (58 tests, no external dependencies)
+cargo test -p phylip-rs --test validation_analytical --test validation_classics --test validation_medium
+```
+
+## Programs Compared
+
+| PHYLIP Program | phylip-rs Module | What's Compared |
+|---|---|---|
+| dnadist (JC69) | models::jc69 | Distance matrix values (tol: 1e-3) |
+| dnadist (K2P) | models::k2p | Distance ranking preservation |
+| neighbor (NJ) | distance::neighbor_joining | Topology (RF=0) + branch lengths (5%) |
+| neighbor (UPGMA) | distance::upgma | Topology + ultrametric property |
+| fitch | distance::fitch_margoliash | WLS score + topology |
+| kitsch | distance::kitsch | WLS score + ultrametric property |
+| dnapars | parsimony::wagner | Score (exact) + topology |
+| dnaml | likelihood::pruning | Log-likelihood (same range) |
+| dnamlk | likelihood::clock | Clock lnL + ultrametric property |
+| protdist | models::protein_distances | Protein distances (tol: 0.05) |
+| seqboot+consense | bootstrap+consensus | Pipeline validation |

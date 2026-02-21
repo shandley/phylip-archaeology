@@ -34,3 +34,7 @@ Thumbs.db
 
 # PHYLIP website clone (large, obtain separately)
 phylip-source/src/
+
+# PHYLIP validation binaries (download via validation/setup.sh)
+validation/phylip-*/
+validation/*.tar.gz
