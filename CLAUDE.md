@@ -110,8 +110,8 @@ drawgram, drawtree, dnamove, dolmove, move, retree, factor
 ## Project Status
 
 ### Completed
-- **Rust reimplementation** — 35,805 lines, 1,033 tests, ~30/36 PHYLIP programs, zero dependencies
-- **Validation suite** — 74 validation tests across 4 strategies (analytical, classic datasets, PHYLIP 3.697 comparison, medium-scale integration)
+- **Rust reimplementation** — 35,805 lines, 1,038 tests, ~30/36 PHYLIP programs, zero dependencies
+- **Validation suite** — 79 validation tests across 4 strategies (analytical, classic datasets, PHYLIP 3.697 comparison, medium-scale integration)
 - **20 algorithmic case studies** — Cross-disciplinary insights documented in INSIGHTS.md
 - **10 interactive demonstrations** — Compilable examples in phylip-rs/examples/
 - **Software catalog analysis** — 407 tools scraped, enriched, analyzed; Figure 4 generated
