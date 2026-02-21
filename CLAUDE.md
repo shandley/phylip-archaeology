@@ -13,29 +13,33 @@ phylip-archaeology/
 ├── INSIGHTS.md            # Deep analysis of 20 algorithmic case studies
 ├── TRIBUTE.md             # Historical narrative of Felsenstein's contributions
 ├── REFLECTION.md          # What we built and what we learned
-├── Cargo.toml             # Workspace root
+├── LICENSE                # MIT License
+├── Cargo.toml             # Workspace root (phylip-rs + phylip-wasm)
+├── .github/workflows/     # CI: test (ubuntu + macos), format check
 ├── phylip-rs/             # Modern Rust reimplementation
 │   ├── Cargo.toml
 │   ├── src/               # Library and CLI source (58 files)
-│   └── examples/          # 10 interactive demonstrations
+│   ├── examples/          # 10 interactive demonstrations
+│   └── tests/             # 4 validation test files (91 tests)
 ├── manuscript/            # Nature Methods Article draft
 │   ├── manuscript.md      # Full manuscript (~6,000 words)
 │   ├── supplementary.md   # Supplementary materials
 │   └── figures/           # Figures 1-2 with generation scripts
+├── validation/            # PHYLIP 3.697 comparison infrastructure
+│   ├── VALIDATION_REPORT.md  # Detailed report (33 tests, 27 programs)
+│   ├── README.md          # Quick start and test overview
+│   └── setup.sh           # Downloads and compiles PHYLIP 3.697
 ├── benchmarks/            # Performance benchmarking pipeline
 │   ├── generate_data.py   # JC69 dataset simulator
 │   ├── run_benchmarks.py  # Multi-tool benchmark runner
-│   ├── plot_figure5.py    # Figure generation script
 │   ├── results/           # benchmark_results.csv (180 runs)
-│   └── figures/           # Figure 5 (PDF/PNG)
+│   └── figures/           # Figure 4 (PDF/PNG)
 ├── catalog/               # Software catalog preservation (407 tools)
-│   └── analysis/          # Scraping, enrichment, Figure 4
-├── validation/            # Validation infrastructure (PHYLIP 3.697 comparison)
-│   ├── VALIDATION_REPORT.md  # Living validation report (Supplementary Note 5)
-│   ├── README.md          # Quick start and test overview
-│   └── setup.sh           # Downloads and compiles PHYLIP 3.697
+│   └── analysis/          # Scraping, enrichment, figures
+├── docs/                  # Interactive WASM demo (GitHub Pages)
+├── phylip-wasm/           # WebAssembly bindings for browser demo
 ├── phylip-source/         # PHYLIP C source code archive and analysis
-└── timeline/              # Historical data and visualizations
+└── timeline/              # Historical data (events.json)
 ```
 
 ## Current Stats
@@ -51,11 +55,32 @@ phylip-archaeology/
 | Compiler warnings | 0 |
 | External dependencies | 0 |
 | PHYLIP programs covered | 29/36 |
+| PHYLIP programs compared | 27 |
 | CLI commands | 9 |
 | Interactive demonstrations | 10 |
 | Algorithmic case studies | 20 |
 | Software catalog tools | 407 |
 | Benchmark datasets | 36 |
+
+## Validation Test Breakdown
+
+| File | Category | Tests |
+|------|----------|-------|
+| validation_analytical.rs | Analytical formulas | 32 |
+| validation_classics.rs | Classic published datasets | 15 |
+| validation_phylip.rs | PHYLIP 3.697 C comparison | 33 |
+| validation_medium.rs | Medium-scale integration | 11 |
+
+Run validation tests:
+```bash
+cargo test -p phylip-rs --test validation_analytical --test validation_classics --test validation_medium --test validation_phylip
+```
+
+Run PHYLIP live comparison (requires PHYLIP 3.697 binaries):
+```bash
+cd validation && bash setup.sh
+PHYLIP_EXE_DIR=validation/phylip-3.697/exe cargo test -p phylip-rs --test validation_phylip -- --ignored
+```
 
 ## phylip-rs Module Map
 
@@ -88,23 +113,31 @@ cargo build                    # Build library and CLI
 cargo test                     # Run all 1,050 tests
 cargo build --examples         # Build interactive demonstrations
 cargo run --release -- --help  # CLI usage
+cargo clippy -- -D warnings    # Lint check
 ```
 
 ## Key Design Principles
 
 - **Zero dependencies** — every mathematical function from first principles (gamma function, matrix exponentiation, Newton-Raphson, continued fractions, etc.)
-- **Fidelity** — algorithms match original PHYLIP behavior, validated against known analytical results
+- **Fidelity** — algorithms match original PHYLIP behavior, validated against PHYLIP 3.697 C executables
 - **Trait-based extensibility** — SubstitutionModel trait, ParsimonyScorer trait for pluggable algorithms
-- **Test-grounded** — tests compare against hand-calculated values and published results, not just regression
+- **Test-grounded** — tests compare against hand-calculated values, published results, and PHYLIP C output
+
+## Key Finding
+
+**No bugs found in PHYLIP.** Direct comparison of 27 programs against our reimplementation found zero mathematical errors in the original C code. Every difference was attributable to deliberate design choices, different search heuristics, or different model implementations. The one algorithmic discrepancy was in *our* code (Dollo parsimony scoring), not PHYLIP's.
+
+## Known Limitations
+
+- **Dollo parsimony (DolloScorer)** — Uses upward-only (postorder) pass; PHYLIP uses two-pass (upward + downward correction placing gain at MRCA). Our scorer can overcount losses. Documented in `parsimony/dollo.rs`.
+- **7 programs not covered** — drawgram, drawtree, dnamove, dolmove, move, retree, factor (interactive/drawing tools, not algorithmic)
 
 ## Git State
 
 - **Branch:** main
 - **Remote:** origin (GitHub: shandley/phylip-archaeology)
-
-## 6 Programs NOT Covered (interactive/drawing tools, not algorithmic)
-
-drawgram, drawtree, dnamove, dolmove, move, retree, factor
+- **Release:** v0.1.0
+- **CI:** GitHub Actions (test on ubuntu + macos, format check)
 
 ## Project Status
 
@@ -114,14 +147,16 @@ drawgram, drawtree, dnamove, dolmove, move, retree, factor
 - **PHYLIP 3.697 comparison** — 33 tests across 27 programs, zero bugs found in original C code
 - **20 algorithmic case studies** — Cross-disciplinary insights documented in INSIGHTS.md
 - **10 interactive demonstrations** — Compilable examples in phylip-rs/examples/
-- **Software catalog analysis** — 407 tools scraped, enriched, analyzed
+- **Software catalog analysis** — 407 tools scraped, enriched, analyzed; interactive explorer at GitHub Pages
 - **Performance benchmarking** — 180 runs (36 datasets x 5 tools)
-- **Figures 1-2** — Workflow schematic and algorithmic discovery panels with generation scripts
+- **Figures 1-4** — Workflow schematic, algorithmic discovery, catalog analysis, benchmarks
 - **Manuscript** — Nature Methods Article (~6,000 words) with supplementary materials
 - **CI/CD** — GitHub Actions: test (ubuntu + macos), format check
 - **Release** — v0.1.0 tagged and published on GitHub
+- **Repository cleanup** — Dev artifacts, empty scaffolding, lock files removed
 
 ### Remaining
 - **Manuscript revision** — Final copy-editing, cover letter
 - **Community engagement** — Share with Joe Felsenstein, phylogenetics community
 - **Submission** — Nature Methods submission
+- **Optional: Fix Dollo scoring** — Implement two-pass algorithm to match PHYLIP's behavior
