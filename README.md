@@ -12,7 +12,7 @@
 
 This project is an archaeological expedition into one of the most important archives in
 the history of bioinformatics: **PHYLIP** (PHYLogeny Inference Package) and Joe
-Felsenstein's comprehensive [catalog of 392+ phylogenetics software packages](https://phylipweb.github.io/phylip/software.html).
+Felsenstein's comprehensive [catalog of 407 phylogenetics software packages](https://phylipweb.github.io/phylip/software.html).
 
 Our goals:
 
@@ -21,7 +21,8 @@ Our goals:
 2. **Mine** the codebase for algorithms and computational ideas that shaped modern
    phylogenetics
 3. **Modernize** the most valuable algorithms with clean, safe Rust implementations
-4. **Honor** the extraordinary contributions of Joe Felsenstein, who built the
+4. **Validate** the reimplementation against PHYLIP's original C executables
+5. **Honor** the extraordinary contributions of Joe Felsenstein, who built the
    computational foundation of an entire scientific discipline
 
 ## Why This Matters
@@ -39,14 +40,24 @@ with log-sum-exp stabilization, standard in deep learning but pioneered here in 
 Site-pattern compression, closed-form matrix decomposition, weight-based bootstrapping
 -- these techniques remain relevant far beyond phylogenetics.
 
-See [INSIGHTS.md](INSIGHTS.md) for a deep analysis of what Felsenstein understood that
-the field is at risk of losing.
+## Key Findings
 
-See [TRIBUTE.md](TRIBUTE.md) for a full historical narrative of Felsenstein's
-contributions.
+**20 cross-disciplinary connections** recovered from PHYLIP's source code, linking
+phylogenetics to electrical engineering (independent contrasts = Kirchhoff's circuit
+laws), information geometry (chord distance on hyperspheres), algebraic statistics
+(Lake's invariants), coding theory (genetic code optimization), and probabilistic
+graphical models (pruning = belief propagation). See [INSIGHTS.md](INSIGHTS.md).
 
-See [REFLECTION.md](REFLECTION.md) for a reflection on what this project built and
-what we learned.
+**No bugs found in PHYLIP.** Direct comparison of 27 PHYLIP programs against our
+reimplementation found zero mathematical errors in the original C code. Every
+difference was attributable to deliberate design choices, different search heuristics,
+or different model implementations. The one algorithmic discrepancy was in *our* code
+(Dollo parsimony scoring), not PHYLIP's. A codebase written primarily by one researcher
+over four decades proved mathematically correct across all algorithmic programs tested.
+
+**23 tools permanently lost.** Analysis of Felsenstein's hand-curated catalog of 407
+phylogenetics tools found that 23 have no archived copy anywhere and may be
+irrecoverable.
 
 ## phylip-rs: The Rust Reimplementation
 
@@ -67,8 +78,10 @@ continued fractions -- is implemented from first principles using only `std`.
 | Total tests | **1,050** |
 | Compiler warnings | **0** |
 | External dependencies | **0** |
-| PHYLIP programs covered | **~30/36** |
+| PHYLIP programs covered | **29/36** |
+| PHYLIP programs compared | **27** |
 | CLI commands | **9** |
+| Interactive demonstrations | **10** |
 
 ### Algorithms Implemented
 
@@ -106,6 +119,7 @@ continued fractions -- is implemented from first principles using only `std`.
 
 **Distance Methods**
 - Neighbor-Joining (Saitou & Nei 1987)
+- UPGMA (Sokal & Michener 1958) -- ultrametric clustering
 - Fitch-Margoliash weighted least squares
 - Kitsch -- clock-constrained Fitch-Margoliash (ultrametric least squares)
 - ML pairwise distances via Newton-Raphson optimization
@@ -161,6 +175,9 @@ cargo run --release -- distance --input alignment.fasta --method nj
 
 # Run bootstrap analysis (100 replicates)
 cargo run --release -- bootstrap --input alignment.fasta --replicates 100
+
+# Run all 1,050 tests
+cargo test
 ```
 
 ### Architecture
@@ -175,7 +192,7 @@ phylip-rs/src/
                  ts/tv estimation, model selection, clock ML
   parsimony/     Wagner, Dollo, Camin-Sokal, branch-and-bound,
                  multistate (Sankoff), protein parsimony
-  distance/      NJ, Fitch-Margoliash, Kitsch, ML distances
+  distance/      NJ, UPGMA, Fitch-Margoliash, Kitsch, ML distances
   bootstrap/     Resampling, consensus trees, ML bootstrap
   consensus/     Strict/majority-rule/extended consensus
   compatibility/ Clique analysis (Bron-Kerbosch), DNA compatibility
@@ -185,120 +202,103 @@ phylip-rs/src/
   main.rs        CLI binary with 9 analysis commands
 ```
 
+## Validation
+
+phylip-rs is validated through four complementary strategies and **1,050 tests**:
+
+1. **Analytical tests** (32) -- mathematical formulas verified against hand-calculated values
+2. **Classic dataset tests** (15) -- published results from Saitou & Nei, Felsenstein, Kimura, Lake, Cavender reproduced
+3. **PHYLIP C comparison** (33) -- direct comparison against PHYLIP 3.697 C executables on identical inputs across 27 programs
+4. **Medium-scale integration** (11) -- statistical properties verified on simulated datasets of 8-100 taxa
+
+The PHYLIP comparison tests use hardcoded reference values (run without PHYLIP installed) with optional live execution when PHYLIP binaries are available:
+
+```bash
+# Run standard tests (no external dependencies)
+cargo test -p phylip-rs
+
+# Download PHYLIP 3.697 and run comparison tests
+cd validation && bash setup.sh
+PHYLIP_EXE_DIR=validation/phylip-3.697/exe cargo test -p phylip-rs --test validation_phylip -- --ignored
+```
+
+See [validation/VALIDATION_REPORT.md](validation/VALIDATION_REPORT.md) for the full report covering all 33 comparison tests with inputs, commands, reference values, tolerances, and known differences.
+
+## Benchmarking
+
+We benchmarked phylip-rs against IQ-TREE 3, RAxML-NG, and VeryFastTree on 36 simulated
+datasets (10-500 taxa, 500-5,000 sites) under JC69. Key findings:
+
+- **Small datasets (10-20 taxa)**: phylip-rs ML is competitive, sometimes finding the same optimum as modern tools
+- **50+ taxa**: modern tools are 10-20x faster with better optima, reflecting four decades of search heuristic engineering
+- **NJ transfers perfectly**: phylip-rs NJ completed all 36 datasets with competitive accuracy
+- **The scoring function is identical**: all trees evaluated under JC69 matched IQ-TREE to 4 decimal places
+
+See [benchmarks/](benchmarks/) for scripts, data, and results (180 benchmark runs).
+
 ## Interactive Demonstrations
 
 Ten executable examples demonstrate algorithmic insights, each proving a specific claim
-with concrete numerical results. Run any of them with `cargo run --release --example <name>`.
+with concrete numerical results. Run any with `cargo run --release --example <name>`.
 
-### The Felsenstein Zone: When More Data Makes You More Wrong
+| Example | What It Demonstrates |
+|---------|---------------------|
+| `felsenstein_zone` | Parsimony converges on the wrong tree; ML gets it right |
+| `language_evolution` | DNA pruning algorithm applied to human languages -- same code |
+| `compositional_bias` | LogDet recovers true tree under GC-bias where JC69 fails |
+| `kirchhoff_contrasts` | Independent contrasts = circuit theory (match to 8+ decimals) |
+| `supplement_bound` | Branch-and-bound examines ~0.05% of tree space for 9 taxa |
+| `dollo_gain_loss` | Dollo vs Fitch: same topology, different biological stories |
+| `chord_geometry` | Chord distance is a literal chord on a hypersphere |
+| `clock_constraints` | Kitsch outperforms UPGMA when the molecular clock is violated |
+| `lake_invariants` | Polynomial invariants identify true topology at 500+ sites |
+| `genetic_code_distances` | The genetic code is optimized for error tolerance (z = -2.76) |
 
-```bash
-cargo run --release --example felsenstein_zone
-```
+## Software Catalog
 
-Simulates Felsenstein's famous 1978 result: maximum parsimony converges on the
-**wrong** tree with increasing confidence as you add data, while maximum likelihood
-correctly recovers the truth.
+Felsenstein maintained a hand-curated catalog of phylogenetics software -- effectively
+a package manager for an entire scientific discipline. We analyzed all 407 tools,
+documenting their preservation status:
 
-### Language Evolution: DNA Code Analyzes Human Languages
+- **196** (48%) archived but unmaintained
+- **137** (34%) dormant (websites accessible, no recent development)
+- **34** (8%) completely unreachable
+- **23** tools have no Wayback Machine archive and may be permanently lost
 
-```bash
-cargo run --release --example language_evolution
-```
-
-Applies the **exact same pruning algorithm** -- designed for DNA -- to linguistic
-data across 6 Romance and Germanic languages. Not a single line of code changes.
-
-### Compositional Bias: LogDet vs JC69
-
-```bash
-cargo run --release --example compositional_bias
-```
-
-Proves LogDet distance is robust to base composition bias. Simulates sequences where
-two unrelated lineages share high GC-content. JC69 groups by GC (wrong tree); LogDet
-recovers the true tree. At 30% bias, JC69 accuracy drops to 64% while LogDet stays at 100%.
-
-### Kirchhoff's Contrasts: Phylogenetics = Circuit Theory
-
-```bash
-cargo run --release --example kirchhoff_contrasts
-```
-
-Proves that Felsenstein's independent contrasts algorithm is mathematically identical
-to solving a resistor network. Side-by-side computation shows contrasts variances and
-circuit effective resistances match to 8+ decimal places.
-
-### Branch-and-Bound: Exact Search Through Exponential Space
-
-```bash
-cargo run --release --example supplement_bound
-```
-
-Demonstrates how the Hendy-Penny branch-and-bound algorithm prunes the vast majority
-of the search space. For 9 taxa (135,135 possible topologies), B&B examines only
-~0.05% while guaranteeing the globally optimal solution.
-
-### Dollo vs Fitch: Different Models, Different Stories
-
-```bash
-cargo run --release --example dollo_gain_loss
-```
-
-Shows how Dollo and Fitch parsimony give the same optimal topology but tell
-fundamentally different biological stories about gain/loss evolution.
-
-### Chord Distance Geometry: Allele Frequencies on a Hypersphere
-
-```bash
-cargo run --release --example chord_geometry
-```
-
-Proves the Cavalli-Sforza chord distance is a literal chord on a hypersphere.
-Square-root transformation maps allele frequencies to the unit sphere; the chord
-distance is proportional to drift time while raw Euclidean distance is not.
-
-### Clock Constraints: UPGMA vs Kitsch
-
-```bash
-cargo run --release --example clock_constraints
-```
-
-Demonstrates how Kitsch optimizes node heights under the ultrametric constraint,
-achieving better fits than UPGMA when the molecular clock is violated.
-
-### Lake's Invariants: Model-Free Topology Identification
-
-```bash
-cargo run --release --example lake_invariants
-```
-
-Proves that polynomial invariants of site-pattern frequencies can identify the true
-4-taxon topology. Both Lake's and Cavender's methods reach 100% accuracy at 500+ sites.
-
-### The Genetic Code Step Matrix: Evolution's Error-Correcting Code
-
-```bash
-cargo run --release --example genetic_code_distances
-```
-
-Computes the 20x20 amino acid step matrix from the genetic code and proves the code is
-optimized to minimize mutation impact. Compared to 1000 random codes, the real genetic
-code has a lower average step distance than any random permutation (z-score = -2.76).
+Browse the catalog: **[Interactive Explorer](https://shandley.github.io/phylip-archaeology/)**
 
 ## Project Structure
 
 ```
 phylip-archaeology/
-├── INSIGHTS.md            # Deep analysis of PHYLIP's algorithmic insights
+├── README.md              # This file
+├── LICENSE                # MIT License
+├── INSIGHTS.md            # 20 cross-disciplinary algorithmic connections
 ├── TRIBUTE.md             # Historical narrative of Felsenstein's contributions
 ├── REFLECTION.md          # What we built and what we learned
-├── catalog/               # Software catalog preservation (392+ tools)
+├── Cargo.toml             # Workspace root (phylip-rs + phylip-wasm)
+├── phylip-rs/             # Rust reimplementation (35,805 lines, 1,050 tests)
+│   ├── src/               # Library and CLI source (58 files)
+│   └── examples/          # 10 interactive demonstrations
+├── manuscript/            # Nature Methods article draft
+│   ├── manuscript.md      # Full manuscript (~6,000 words)
+│   ├── supplementary.md   # Supplementary materials
+│   └── figures/           # Figures 1-2 with generation scripts
+├── validation/            # PHYLIP 3.697 comparison infrastructure
+│   ├── VALIDATION_REPORT.md  # Detailed report (33 tests, 27 programs)
+│   ├── README.md          # Quick start guide
+│   └── setup.sh           # Downloads and compiles PHYLIP 3.697
+├── benchmarks/            # Performance benchmarking pipeline
+│   ├── generate_data.py   # JC69 dataset simulator
+│   ├── run_benchmarks.py  # Multi-tool benchmark runner
+│   ├── results/           # benchmark_results.csv (180 runs)
+│   └── figures/           # Figure 4 (PDF/PNG)
+├── catalog/               # Software catalog preservation (407 tools)
+│   └── analysis/          # Scraping, enrichment, figures
+├── docs/                  # Interactive WASM demo (GitHub Pages)
+├── phylip-wasm/           # WebAssembly bindings for browser demo
 ├── phylip-source/         # PHYLIP C source code archive and analysis
 ├── algorithms/            # Extracted algorithm documentation
-├── phylip-rs/             # Modern Rust reimplementation (35,805 lines)
-│   ├── src/               # Library and CLI source (58 files)
-│   └── examples/          # Interactive demonstrations (10)
 └── timeline/              # Historical data and visualizations
 ```
 
@@ -306,7 +306,7 @@ phylip-archaeology/
 
 - **Fidelity first**: Preserve original algorithms exactly before modernizing
 - **Zero dependencies**: The code is its own textbook -- every function from first principles
-- **Validation**: 1,050 tests verify correctness against known analytical results, including direct comparison against 27 PHYLIP 3.697 C programs
+- **Validation**: 1,050 tests including direct comparison against 27 PHYLIP 3.697 C programs
 - **Attribution**: Every algorithm traces back to its originator and key papers
 - **Accessibility**: Clear documentation for both historians and practitioners
 - **Respect**: This is archaeology, not criticism -- honor the constraints of the era

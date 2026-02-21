@@ -5,7 +5,7 @@ edition = "2021"
 authors = ["PHYLIP Archaeology Project Contributors"]
 description = "Modern Rust reimplementations of classic phylogenetic algorithms from PHYLIP"
 license = "MIT"
-repository = "https://github.com/phylip-archaeology/phylip-archaeology"
+repository = "https://github.com/shandley/phylip-archaeology"
 keywords = ["phylogenetics", "bioinformatics", "evolution", "phylip", "algorithms"]
 categories = ["science", "algorithms"]
 
