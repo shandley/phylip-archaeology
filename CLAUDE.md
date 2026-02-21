@@ -47,8 +47,8 @@ phylip-archaeology/
 | Source files | 58 |
 | Unit tests | 934 |
 | Doc tests | 25 |
-| Validation tests | 88 |
-| Total tests | 1,047 |
+| Validation tests | 91 |
+| Total tests | 1,050 |
 | Compiler warnings | 0 |
 | External dependencies | 0 |
 | PHYLIP programs covered | ~30/36 |
@@ -86,7 +86,7 @@ phylip-rs/src/
 ```bash
 cd phylip-rs
 cargo build                    # Build library and CLI
-cargo test                     # Run all 1,047 tests
+cargo test                     # Run all 1,050 tests
 cargo build --examples         # Build interactive demonstrations
 cargo run --release -- --help  # CLI usage
 ```
@@ -110,8 +110,8 @@ drawgram, drawtree, dnamove, dolmove, move, retree, factor
 ## Project Status
 
 ### Completed
-- **Rust reimplementation** — 35,805 lines, 1,047 tests, ~30/36 PHYLIP programs, zero dependencies
-- **Validation suite** — 88 validation tests across 4 strategies (analytical, classic datasets, PHYLIP 3.697 comparison, medium-scale integration)
+- **Rust reimplementation** — 35,805 lines, 1,050 tests, ~30/36 PHYLIP programs, zero dependencies
+- **Validation suite** — 91 validation tests across 4 strategies (analytical, classic datasets, PHYLIP 3.697 comparison, medium-scale integration)
 - **20 algorithmic case studies** — Cross-disciplinary insights documented in INSIGHTS.md
 - **10 interactive demonstrations** — Compilable examples in phylip-rs/examples/
 - **Software catalog analysis** — 407 tools scraped, enriched, analyzed; Figure 4 generated

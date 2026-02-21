@@ -68,6 +68,14 @@ use crate::tree::types::{Alignment, Base, Tree};
 /// - Cost = number of children that are {A} (=0) when the parent is
 ///   forced to {T} (each is one reversal / loss event).
 /// - If **both** children are {A} (=0), the parent is {A} with 0 cost.
+///
+/// **Limitation:** This scorer implements only the upward (postorder) pass,
+/// which always propagates the derived state to the root.  PHYLIP's Dollo
+/// algorithm uses a two-pass approach: an upward pass followed by a downward
+/// correction that places the gain at the MRCA of derived-state taxa rather
+/// than the root.  The upward-only approach can overcount losses when the
+/// optimal gain placement is below the root.  A future improvement would
+/// add the downward correction pass to match PHYLIP's exact scoring.
 pub struct DolloScorer;
 
 impl ParsimonyScorer for DolloScorer {

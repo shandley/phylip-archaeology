@@ -13,7 +13,7 @@ and reproduction instructions, see **[VALIDATION_REPORT.md](VALIDATION_REPORT.md
 cd validation
 bash setup.sh
 
-# 2. Run PHYLIP comparison tests (30 tests)
+# 2. Run PHYLIP comparison tests (33 tests)
 PHYLIP_EXE_DIR=validation/phylip-3.697/exe cargo test -p phylip-rs --test validation_phylip -- --ignored
 
 # 3. Run all other validation tests (58 tests, no external dependencies)
@@ -47,5 +47,8 @@ cargo test -p phylip-rs --test validation_analytical --test validation_classics 
 | restdist | models::restriction | Nei-Li distances (tol: 0.02) |
 | contml | comparative::contml | Brownian ML lnL |
 | contrast | comparative::contrasts | PIC correlations (tol: 0.15) |
+| dolpenny | parsimony::dollo+branch_and_bound | Dollo B&B score (known limitation) |
+| proml | models::protein+likelihood | Protein lnL (structural, Poisson vs JTT) |
+| promlk | models::protein+likelihood | Protein clock lnL (structural) |
 | seqboot+consense | bootstrap+consensus | Pipeline validation |
 | treedist | tree::distances | Robinson-Foulds distance (exact) |
