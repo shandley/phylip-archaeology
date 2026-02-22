@@ -34,6 +34,7 @@
 //! Reference: Felsenstein, J. (1985). Confidence limits on phylogenies:
 //! an approach using the bootstrap. Evolution, 39, 783-791.
 
+pub mod au_test;
 pub mod ml;
 pub mod support;
 

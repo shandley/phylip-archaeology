@@ -20,6 +20,8 @@
 //! - `io` - File format I/O (PHYLIP format, FASTA)
 //! - `models` - Nucleotide substitution models (JC69, K2P, F81, F84)
 //! - `comparative` - Continuous character comparative methods (independent contrasts, contml)
+//! - `biogeography` - Dispersal-Vicariance Analysis (DIVA, Ronquist 1997)
+//! - `reconciliation` - Host-parasite tree reconciliation (TREEMAP, Page 1994)
 
 pub mod tree;
 pub mod distance;
@@ -32,3 +34,5 @@ pub mod consensus;
 pub mod invariants;
 pub mod io;
 pub mod models;
+pub mod biogeography;
+pub mod reconciliation;

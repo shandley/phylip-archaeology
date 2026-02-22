@@ -21,10 +21,12 @@ phylip-archaeology/
 │   ├── src/               # Library and CLI source (58 files)
 │   ├── examples/          # 10 interactive demonstrations
 │   └── tests/             # 4 validation test files (91 tests)
-├── manuscript/            # Nature Methods Article draft
-│   ├── manuscript.md      # Full manuscript (~6,000 words)
+├── manuscript/            # Manuscripts
+│   ├── manuscript.md      # Nature Methods Article (~6,000 words)
 │   ├── supplementary.md   # Supplementary materials
-│   └── figures/           # Figures 1-2 with generation scripts
+│   ├── figures/           # Figures 1-2 with generation scripts
+│   └── resurrections/     # PLOS Comp Bio Education manuscript
+│       └── manuscript.md  # "Algorithms outlive implementations" (~2,400 words)
 ├── validation/            # PHYLIP 3.697 comparison infrastructure
 │   ├── VALIDATION_REPORT.md  # Detailed report (33 tests, 27 programs)
 │   ├── README.md          # Quick start and test overview
@@ -46,16 +48,17 @@ phylip-archaeology/
 
 | Metric | Value |
 |--------|-------|
-| Lines of Rust | 35,805 |
-| Source files | 58 |
-| Unit tests | 934 |
-| Doc tests | 25 |
+| Lines of Rust | 42,105 |
+| Source files | 65 |
+| Unit tests | 1,062 |
+| Doc tests | 30 |
 | Validation tests | 91 |
-| Total tests | 1,050 |
+| Total tests | 1,150 |
 | Compiler warnings | 0 |
 | External dependencies | 0 |
 | PHYLIP programs covered | 29/36 |
 | PHYLIP programs compared | 27 |
+| Resurrected tools | 5 |
 | CLI commands | 9 |
 | Interactive demonstrations | 10 |
 | Algorithmic case studies | 20 |
@@ -91,15 +94,19 @@ phylip-rs/src/
   models/         Substitution models (JC69, K2P, F81, F84, protein/WAG),
                   LogDet, protein distances, restriction site, gene frequency
   likelihood/     Pruning algorithm, ML search, NNI, gamma rates,
-                  ts/tv estimation, model selection, clock-constrained ML
+                  ts/tv estimation, model selection, clock-constrained ML,
+                  TipDate (serial-sample clock), PLATO (recombination detection)
   parsimony/      Wagner, Dollo, Camin-Sokal, branch-and-bound,
                   multistate (Sankoff), protein parsimony, ParsimonyScorer trait
   distance/       NJ, UPGMA, Fitch-Margoliash, Kitsch, ML pairwise distances
-  bootstrap/      Resampling, consensus trees, ML bootstrap
+  bootstrap/      Resampling, consensus trees, ML bootstrap,
+                  AU test (multiscale bootstrap hypothesis testing)
   consensus/      Strict/majority-rule/extended consensus
   compatibility/  Clique analysis (Bron-Kerbosch), DNA compatibility
   comparative/    Independent contrasts, Brownian motion ML (contml)
   invariants/     Lake's & Cavender's phylogenetic invariants
+  biogeography/   DIVA dispersal-vicariance analysis (Ronquist 1997)
+  reconciliation/ TREEMAP host-parasite tree reconciliation (Page 1994)
   io/             PHYLIP format, FASTA, binary data, output reports
   main.rs         CLI binary with 9 analysis commands
   lib.rs          Library root
@@ -110,7 +117,7 @@ phylip-rs/src/
 ```bash
 cd phylip-rs
 cargo build                    # Build library and CLI
-cargo test                     # Run all 1,050 tests
+cargo test                     # Run all 1,150 tests
 cargo build --examples         # Build interactive demonstrations
 cargo run --release -- --help  # CLI usage
 cargo clippy -- -D warnings    # Lint check
@@ -142,7 +149,7 @@ cargo clippy -- -D warnings    # Lint check
 ## Project Status
 
 ### Completed
-- **Rust reimplementation** — 35,805 lines, 1,050 tests, 29/36 PHYLIP programs, zero dependencies
+- **Rust reimplementation** — 42,105 lines, 1,150 tests, 29/36 PHYLIP programs, zero dependencies
 - **Validation suite** — 91 validation tests across 4 strategies (analytical, classic datasets, PHYLIP 3.697 comparison, medium-scale integration)
 - **PHYLIP 3.697 comparison** — 33 tests across 27 programs, zero bugs found in original C code
 - **20 algorithmic case studies** — Cross-disciplinary insights documented in INSIGHTS.md
@@ -154,9 +161,12 @@ cargo clippy -- -D warnings    # Lint check
 - **CI/CD** — GitHub Actions: test (ubuntu + macos), format check
 - **Release** — v0.1.0 tagged and published on GitHub
 - **Repository cleanup** — Dev artifacts, empty scaffolding, lock files removed
+- **5 resurrected tools** — TipDate, AU test, DIVA, TREEMAP, PLATO reimplemented with 128 new tests (see RESURRECTIONS.md)
+- **Resurrections manuscript** — PLOS Comp Bio Education perspective (~2,400 words), "Algorithms outlive implementations"
 
 ### Remaining
-- **Manuscript revision** — Final copy-editing, cover letter
+- **Nature Methods manuscript revision** — Final copy-editing, cover letter, update stats to include resurrected tools
+- **PLOS Comp Bio manuscript** — Figure design, pre-submission inquiry to ploscompbiol@plos.org
 - **Community engagement** — Share with Joe Felsenstein, phylogenetics community
-- **Submission** — Nature Methods submission
+- **Submission** — Both manuscripts
 - **Optional: Fix Dollo scoring** — Implement two-pass algorithm to match PHYLIP's behavior

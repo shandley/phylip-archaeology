@@ -9,6 +9,8 @@ pub mod model_selection;
 pub mod models;
 pub mod nni;
 pub mod optimized;
+pub mod plato;
 pub mod pruning;
 pub mod search;
+pub mod tipdate;
 pub mod ttratio;
